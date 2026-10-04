@@ -70,8 +70,8 @@ const seasonData = {
         p1: { attendanceScore: 3, goals: 1, assists: 1, appearances: [true, true, false, true, true, true, false] },
         p3: { attendanceScore: 3, goals: 4, assists: 4, appearances: [true, true, true, true, true, false, true] },
         p4: { attendanceScore: 3, goals: 1, assists: 1, appearances: [true, false, true, true, false, true, true] },
-        p6: { attendanceScore: 3, goals: 1, assists: 0, appearances: [false, true, true, true, false, true, true] },
-        p11: { attendanceScore: 3, goals: 1, assists: 1, appearances: [true, true, false, true, true, true, false] },
+        p6: { attendanceScore: 1, goals: 1, assists: 0, appearances: [false, true, true, true, false, true, true] },
+        p11: { attendanceScore: 1, goals: 1, assists: 1, appearances: [true, true, false, true, true, true, false] },
         p12: { attendanceScore: 0, goals: 4, assists: 4, appearances: [true, true, true, true, true, false, true] },
         p13: { attendanceScore: 0, goals: 1, assists: 3, appearances: [true, true, true, false, true, true, true] },
         p14: { attendanceScore: 0, goals: 4, assists: 1, appearances: [false, false, true, false, true, true, true] },
@@ -85,12 +85,14 @@ function App() {
   const [isDownloading, setIsDownloading] = useState(false);
   const data = seasonData;
   const [selectedMatchId, setSelectedMatchId] = useState(data.matches.at(-1)?.id ?? '');
+  const [includeGuests, setIncludeGuests] = useState(false);
   const selectedMatch = data.matches.find((match) => match.id === selectedMatchId) ?? data.matches.at(-1);
   const seasonRows = buildSeasonStats(data);
+  const visibleSeasonRows = includeGuests ? seasonRows : seasonRows.filter((row) => !row.guest);
   const summary = buildSummary(data);
   const winRate = summary.matches ? Math.round((summary.wins / summary.matches) * 100) : 0;
   const recentResults = data.matches.slice(-8).map(getResult);
-  const scorerRows = seasonRows.filter((row) => row.goals > 0).sort((a, b) => b.goals - a.goals || b.points - a.points);
+  const scorerRows = visibleSeasonRows.filter((row) => row.goals > 0).sort((a, b) => b.goals - a.goals || b.points - a.points);
   const topGoals = Math.max(...scorerRows.map((row) => row.goals), 1);
 
   async function downloadImage() {
@@ -133,6 +135,17 @@ function App() {
           <MetricCard icon="G" label="총 득점" value={summary.goalsFor} note={`경기당 ${toFixed(summary.goalsFor / summary.matches)}골`} tone="blue" />
           <MetricCard icon="+/-" label="득실차" value={formatSigned(summary.goalDiff)} note={`${summary.goalsFor}득점 / ${summary.goalsAgainst}실점`} tone="green" />
           <MetricCard icon="W" label="최근 흐름" value={recentResults.join('')} note={`최근 ${recentResults.length}경기`} tone="red" />
+        </section>
+
+        <section className="stats-filter-row" aria-label="용병 통계 필터">
+          <div className="guest-filter" role="group" aria-label="용병 포함 여부">
+            <button type="button" className={!includeGuests ? 'active' : ''} onClick={() => setIncludeGuests(false)}>
+              용병 제외
+            </button>
+            <button type="button" className={includeGuests ? 'active' : ''} onClick={() => setIncludeGuests(true)}>
+              용병 포함
+            </button>
+          </div>
         </section>
 
         <section className="insight-grid">
@@ -192,7 +205,7 @@ function App() {
                 </tr>
               </thead>
               <tbody>
-                {seasonRows.map((row, index) => (
+                {visibleSeasonRows.map((row, index) => (
                   <tr key={row.id}>
                     <td className="rank">#{index + 1}</td>
                     <td className="player"><PlayerName player={row} /></td>
@@ -377,7 +390,7 @@ function AppearanceDots({ appearances = [], total = 8 }) {
   return (
     <div className="appearance-cell" aria-label={`총 ${playedCount}쿼터 출전`}>
       <b>{playedCount}쿼터</b>
-      <div className="appearance-dots" style={{ gridTemplateColumns: `repeat(${total}, 13px)` }}>
+      <div className="appearance-dots" style={{ '--quarter-count': total }}>
         {dots.map((played, index) => (
           <span
             className={played ? 'appearance-dot played' : 'appearance-dot missed'}

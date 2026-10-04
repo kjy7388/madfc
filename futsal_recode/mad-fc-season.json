@@ -1,0 +1,58 @@
+{
+  "club": "Mad FC",
+  "season": "2026 시즌",
+  "players": [
+    { "id": "p1", "name": "박경민", "position": "DF" },
+    { "id": "p2", "name": "최용호", "position": "MF", "guest": true },
+    { "id": "p3", "name": "고유순", "position": "FW" },
+    { "id": "p4", "name": "김장엽", "position": "DF" },
+    { "id": "p5", "name": "이현규", "position": "DF", "guest": true },
+    { "id": "p6", "name": "전창욱", "position": "MF" },
+    { "id": "p7", "name": "박진규", "position": "FW" },
+    { "id": "p8", "name": "대영", "position": "FW", "guest": true },
+    { "id": "p9", "name": "이동섭", "position": "DF" },
+    { "id": "p10", "name": "조도연", "position": "FW" },
+    { "id": "p11", "name": "유재홍", "position": "MF" },
+    { "id": "p12", "name": "황훈식", "position": "MF", "guest": true },
+    { "id": "p13", "name": "허진강", "position": "DF", "guest": true },
+    { "id": "p14", "name": "류경상", "position": "FW", "guest": true }
+  ],
+  "matches": [
+    {
+      "id": "20260905",
+      "date": "2026-09-05",
+      "venue": "용산",
+      "opponent": "연규네",
+      "teamScore": 21,
+      "opponentScore": 12,
+      "playerStats": {
+        "p1": { "attendanceScore": 2, "goals": 5, "assists": 3, "appearances": [false, true, true, false, true, false, true, true] },
+        "p2": { "attendanceScore": 0, "goals": 3, "assists": 4, "appearances": [true, true, true, false, true, false, true, true] },
+        "p3": { "attendanceScore": 2, "goals": 5, "assists": 0, "appearances": [true, false, true, false, true, true, true, true] },
+        "p4": { "attendanceScore": 3, "goals": 3, "assists": 2, "appearances": [true, false, true, true, false, true, false, true] },
+        "p5": { "attendanceScore": 0, "goals": 2, "assists": 2, "appearances": [true, false, true, true, true, false, false, false] },
+        "p6": { "attendanceScore": 1, "goals": 2, "assists": 1, "appearances": [false, true, false, true, false, true, true, false] },
+        "p7": { "attendanceScore": 3, "goals": 1, "assists": 2, "appearances": [false, true, false, true, false, true, false, true] },
+        "p8": { "attendanceScore": 0, "goals": 0, "assists": 0, "appearances": [true, true, false, true, true, true, true, false] }
+      }
+    },
+    {
+      "id": "20261003",
+      "date": "2026-10-03",
+      "venue": "광명",
+      "opponent": "Hey FC",
+      "teamScore": 17,
+      "opponentScore": 15,
+      "playerStats": {
+        "p1": { "attendanceScore": 3, "goals": 1, "assists": 1, "appearances": [true, true, false, true, true, true, false] },
+        "p3": { "attendanceScore": 3, "goals": 4, "assists": 4, "appearances": [true, true, true, true, true, false, true] },
+        "p4": { "attendanceScore": 3, "goals": 1, "assists": 1, "appearances": [true, false, true, true, false, true, true] },
+        "p6": { "attendanceScore": 3, "goals": 1, "assists": 0, "appearances": [false, true, true, true, false, true, true] },
+        "p11": { "attendanceScore": 3, "goals": 1, "assists": 1, "appearances": [true, true, false, true, true, true, false] },
+        "p12": { "attendanceScore": 0, "goals": 4, "assists": 4, "appearances": [true, true, true, true, true, false, true] },
+        "p13": { "attendanceScore": 0, "goals": 1, "assists": 3, "appearances": [true, true, true, false, true, true, true] },
+        "p14": { "attendanceScore": 0, "goals": 4, "assists": 1, "appearances": [false, false, true, false, true, true, true] }
+      }
+    }
+  ]
+}

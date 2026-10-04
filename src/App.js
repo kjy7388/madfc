@@ -243,7 +243,7 @@ function App() {
               <h2>{data.club} vs {selectedMatch.opponent}</h2>
               <p>{selectedMatch.venue} | 최종 스코어 {selectedMatch.teamScore} : {selectedMatch.opponentScore}</p>
             </div>
-            <strong>{getResult(selectedMatch)}</strong>
+            <strong className={resultClass(getResult(selectedMatch))}>{getResult(selectedMatch)}</strong>
           </div>
 
           <div className="quarter-strip" aria-label="쿼터별 결과">

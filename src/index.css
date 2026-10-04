@@ -1081,13 +1081,23 @@ tbody tr:hover {
   }
 
   .match-header {
+    display: grid;
+    grid-template-columns: minmax(0, 280px) 44px;
+    align-items: center;
+    justify-content: start;
     gap: 10px;
     padding: 12px;
+  }
+
+  .match-header > div {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .match-header h2 {
     margin: 4px 0 6px;
     font-size: 1.32rem;
+    overflow-wrap: anywhere;
   }
 
   .match-header p {
@@ -1096,9 +1106,25 @@ tbody tr:hover {
   }
 
   .match-header strong {
-    width: 52px;
-    height: 52px;
-    font-size: 1.45rem;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    font-size: 1.18rem;
+  }
+
+  .match-header strong.win {
+    background: rgba(40, 199, 111, 0.16);
+    color: var(--green);
+  }
+
+  .match-header strong.draw {
+    background: rgba(139, 149, 167, 0.18);
+    color: #c0c7d2;
+  }
+
+  .match-header strong.loss {
+    background: rgba(255, 91, 105, 0.16);
+    color: var(--red);
   }
 
   .quarter-strip {
@@ -1156,53 +1182,126 @@ tbody tr:hover {
   }
 
   .match-stats-table th:nth-child(2),
-  .match-stats-table td:nth-child(2),
-  .match-stats-table th:nth-child(6),
-  .match-stats-table td:nth-child(6) {
+  .match-stats-table td:nth-child(2) {
     display: none;
+  }
+
+  .match-stats-panel {
+    width: 100%;
+    max-width: calc(100vw - 52px);
+    justify-self: stretch;
+  }
+
+  .match-stats-table,
+  .match-stats-table thead,
+  .match-stats-table tbody {
+    display: block;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .match-stats-table tr {
+    display: grid;
+    grid-template-columns:
+      88px
+      22px
+      22px
+      42px
+      34px
+      54px
+      42px;
+    align-items: center;
+    box-sizing: border-box;
+    justify-content: space-between;
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .match-stats-table thead tr {
+    min-height: 44px;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(43, 54, 80, 0.72);
+    background: #1b2333;
+  }
+
+  .match-stats-table tbody tr {
+    border-bottom: 1px solid rgba(43, 54, 80, 0.72);
+  }
+
+  .match-stats-table tbody tr:last-child {
+    border-bottom: 0;
   }
 
   .match-stats-table th:nth-child(1),
   .match-stats-table td:nth-child(1) {
-    width: 24%;
+    width: auto;
   }
 
   .match-stats-table th:nth-child(3),
   .match-stats-table td:nth-child(3) {
-    width: 8%;
+    width: auto;
     text-align: center;
   }
 
   .match-stats-table th:nth-child(4),
   .match-stats-table td:nth-child(4) {
-    width: 8%;
+    width: auto;
     text-align: center;
   }
 
   .match-stats-table th:nth-child(5),
   .match-stats-table td:nth-child(5) {
-    width: 8%;
+    width: auto;
+    text-align: center;
+  }
+
+  .match-stats-table th:nth-child(6),
+  .match-stats-table td:nth-child(6) {
+    width: auto;
     text-align: center;
   }
 
   .match-stats-table th:nth-child(7),
   .match-stats-table td:nth-child(7) {
-    width: 30%;
+    width: auto;
   }
 
   .match-stats-table th:nth-child(8),
   .match-stats-table td:nth-child(8) {
-    width: 22%;
+    width: auto;
     text-align: center;
   }
 
   .match-stats-table th,
   .match-stats-table td {
-    padding: 8px 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: 100%;
+    padding: 8px 2px;
+    border-bottom: 0;
     font-size: 0.75rem;
   }
 
+  .match-stats-table th {
+    position: static;
+    top: auto;
+    z-index: auto;
+    background: transparent;
+    line-height: 1.15;
+  }
+
+  .match-stats-table th:first-child,
+  .match-stats-table td:first-child {
+    justify-content: flex-start;
+  }
+
   .match-stats-table th:nth-child(3),
+  .match-stats-table th:nth-child(6),
   .match-stats-table th:nth-child(7),
   .match-stats-table th:nth-child(8) {
     font-size: 0;
@@ -1213,17 +1312,29 @@ tbody tr:hover {
     font-size: 0.75rem;
   }
 
+  .match-stats-table th:nth-child(5) {
+    font-size: 0.68rem;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .match-stats-table th:nth-child(6)::after {
+    content: "공격P";
+    font-size: 0.68rem;
+    line-height: 1.1;
+   }
+
   .match-stats-table th:nth-child(7)::after {
     content: "출전\a쿼터";
     white-space: pre;
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     line-height: 1.15;
   }
 
   .match-stats-table th:nth-child(8)::after {
     content: "득실\a마진";
     white-space: pre;
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     line-height: 1.15;
   }
 
@@ -1240,12 +1351,12 @@ tbody tr:hover {
   }
 
   .appearance-dots {
-    grid-template-columns: repeat(var(--quarter-count, 8), 7px);
+    grid-template-columns: repeat(var(--quarter-count, 8), 6px);
     gap: 1px;
   }
 
   .appearance-dot {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
   }
 }

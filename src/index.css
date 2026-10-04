@@ -74,15 +74,39 @@ select {
 }
 
 .hero-panel {
+  position: relative;
+  overflow: hidden;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  gap: 18px;
-  padding: 26px;
+  gap: 24px;
+  padding: 24px 26px;
   margin-bottom: 16px;
+  background:
+    linear-gradient(135deg, rgba(63, 134, 255, 0.11), transparent 38%),
+    rgba(21, 27, 41, 0.95);
 }
 
-.club-title span,
+.hero-watermark {
+  position: absolute;
+  right: 110px;
+  top: 50%;
+  z-index: 0;
+  width: 230px;
+  height: 230px;
+  opacity: 0.07;
+  pointer-events: none;
+  transform: translateY(-50%) rotate(-4deg);
+  object-fit: contain;
+  mix-blend-mode: screen;
+  filter: brightness(1.5) saturate(1.08);
+}
+
+.hero-panel > *:not(.hero-watermark) {
+  position: relative;
+  z-index: 1;
+}
+
 .section-title span,
 .match-header span {
   color: var(--muted);
@@ -92,19 +116,47 @@ select {
   text-transform: uppercase;
 }
 
-.club-title h1 {
-  margin: 8px 0;
-  color: #ffffff;
-  font-size: clamp(2.8rem, 6vw, 5.6rem);
-  line-height: 0.92;
-  letter-spacing: 0;
+.club-brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.club-wordmark {
+  display: block;
+  width: 240px;
+  max-width: 100%;
+  height: auto;
+  margin: 0 0 7px;
+  object-fit: contain;
 }
 
 .club-title p {
-  max-width: 60ch;
-  margin: 0;
+  margin: 5px 0 0;
   color: var(--muted);
-  line-height: 1.65;
+  font-size: 0.92rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  line-height: 1.15;
+}
+
+.hero-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+  flex: 0 0 auto;
+}
+
+.season-badge {
+  border: 1px solid rgba(63, 134, 255, 0.32);
+  border-radius: 999px;
+  background: rgba(63, 134, 255, 0.1);
+  color: #dbe8ff;
+  font-size: 0.8rem;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  padding: 8px 12px;
 }
 
 .download-button {
@@ -983,6 +1035,7 @@ tbody tr:hover {
     overflow-x: hidden;
   }
 
+  .club-brand,
   .club-title,
   .top-kpis > *,
   .insight-grid > *,
@@ -991,33 +1044,58 @@ tbody tr:hover {
   }
 
   .hero-panel {
+    align-items: stretch;
     gap: 12px;
     padding: 14px;
     margin-bottom: 10px;
   }
 
-  .club-title span,
+  .hero-watermark {
+    right: 8px;
+    top: 50%;
+    width: 168px;
+    height: 168px;
+    opacity: 0.1;
+    transform: translateY(-50%) rotate(-5deg);
+  }
+
   .section-title span,
   .match-header span {
     font-size: 0.72rem;
     letter-spacing: 0.06em;
   }
 
-  .club-title h1 {
-    margin: 6px 0;
-    font-size: clamp(2.35rem, 14vw, 3.45rem);
+  .club-brand {
+    gap: 0;
+  }
+
+  .club-wordmark {
+    width: 172px;
+    margin-bottom: 5px;
   }
 
   .club-title p {
-    max-width: 100%;
-    font-size: 0.86rem;
-    line-height: 1.45;
-    word-break: keep-all;
-    overflow-wrap: anywhere;
+    margin-top: 4px;
+    font-size: 0.68rem;
+    letter-spacing: 0.13em;
+  }
+
+  .hero-actions {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .season-badge {
+    font-size: 0.68rem;
+    letter-spacing: 0.09em;
+    padding: 7px 10px;
   }
 
   .download-button {
-    align-self: flex-end;
+    align-self: auto;
     width: auto;
     min-height: 34px;
     padding: 7px 11px;

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { toPng } from 'html-to-image';
+import madfcLogo from './assets/images/madfc-logo.png';
+import madfcWordmark from './assets/images/madfc-wordmark.png';
 import './index.css';
 
 const seasonData = {
@@ -149,15 +151,21 @@ function App() {
     <div className="export-stage">
       <main className="mad-page" ref={reportRef}>
         <section className="hero-panel">
-          <div className="club-title">
-            <span>{data.season}</span>
-            <h1>{data.club}</h1>
-            <p>경기별 득점, 어시스트, 실점 흐름과 선수별 누적 기록을 한 장의 리포트로 정리합니다.</p>
+          <img className="hero-watermark" src={madfcLogo} alt="" aria-hidden="true" />
+          <div className="club-brand">
+            <div className="club-title">
+              <img className="club-wordmark" src={madfcWordmark} alt="MAD FC" />
+              <p>FUTSAL CLUB</p>
+              <p>SINCE 2012</p>
+            </div>
           </div>
 
-          <button className="download-button no-export" type="button" onClick={downloadImage} disabled={isDownloading}>
-            {isDownloading ? '이미지 생성 중' : '이미지 다운로드'}
-          </button>
+          <div className="hero-actions">
+            <span className="season-badge">2026 SEASON</span>
+            <button className="download-button no-export" type="button" onClick={downloadImage} disabled={isDownloading}>
+              {isDownloading ? '이미지 생성 중' : '이미지 다운로드'}
+            </button>
+          </div>
         </section>
 
         <section className="top-kpis">

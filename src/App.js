@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toPng } from 'html-to-image';
 import './index.css';
 
@@ -80,20 +80,50 @@ const seasonData = {
   ],
 };
 
+const RANK_METRICS = [
+  { key: 'goals', label: '득점' },
+  { key: 'assists', label: '어시스트' },
+  { key: 'points', label: '공격P' },
+];
+
 function App() {
   const reportRef = useRef(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const data = seasonData;
   const [selectedMatchId, setSelectedMatchId] = useState(data.matches.at(-1)?.id ?? '');
   const [includeGuests, setIncludeGuests] = useState(false);
+  const [rankingMetric, setRankingMetric] = useState('goals');
+  const [activeMatchTab, setActiveMatchTab] = useState('summary');
+  const [selectedPlayerId, setSelectedPlayerId] = useState(null);
   const selectedMatch = data.matches.find((match) => match.id === selectedMatchId) ?? data.matches.at(-1);
   const seasonRows = buildSeasonStats(data);
+  const selectedPlayerDetail = selectedPlayerId ? buildPlayerDetail(data, seasonRows, selectedPlayerId) : null;
   const visibleSeasonRows = includeGuests ? seasonRows : seasonRows.filter((row) => !row.guest);
   const summary = buildSummary(data);
   const winRate = summary.matches ? Math.round((summary.wins / summary.matches) * 100) : 0;
   const recentResults = data.matches.slice(-8).map(getResult);
-  const scorerRows = visibleSeasonRows.filter((row) => row.goals > 0).sort((a, b) => b.goals - a.goals || b.points - a.points);
-  const topGoals = Math.max(...scorerRows.map((row) => row.goals), 1);
+  const rankingRows = buildRankingRows(visibleSeasonRows, rankingMetric).slice(0, 5);
+  const topRankingValue = Math.max(...rankingRows.map((row) => row.rankValue), 1);
+
+  useEffect(() => {
+    if (!selectedPlayerDetail) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        setSelectedPlayerId(null);
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedPlayerDetail]);
 
   async function downloadImage() {
     if (!reportRef.current) return;
@@ -176,12 +206,25 @@ function App() {
 
           <article className="panel-card scoring-card">
             <SectionTitle eyebrow="Scoring Rank" title="득점 랭킹" />
-            {scorerRows.slice(0, 5).map((row, index) => (
+            <div className="rank-tabs" role="tablist" aria-label="랭킹 종류">
+              {RANK_METRICS.map((metric) => (
+                <button
+                  type="button"
+                  className={rankingMetric === metric.key ? 'active' : ''}
+                  aria-selected={rankingMetric === metric.key}
+                  onClick={() => setRankingMetric(metric.key)}
+                  key={metric.key}
+                >
+                  {metric.label}
+                </button>
+              ))}
+            </div>
+            {rankingRows.map((row) => (
               <div className="rank-line" key={row.id}>
-                <span>{index + 1}</span>
-                <b><PlayerName player={row} /></b>
-                <div className="rank-track"><i style={{ width: `${(row.goals / topGoals) * 100}%` }} /></div>
-                <em>{row.goals}골</em>
+                <span>{row.rank}</span>
+                <b><PlayerName player={row} onClick={() => setSelectedPlayerId(row.id)} /></b>
+                <div className="rank-track"><i style={{ width: `${(row.rankValue / topRankingValue) * 100}%` }} /></div>
+                <em>{formatRankValue(row.rankValue, rankingMetric)}</em>
               </div>
             ))}
           </article>
@@ -208,7 +251,7 @@ function App() {
                 {visibleSeasonRows.map((row, index) => (
                   <tr key={row.id}>
                     <td className="rank">#{index + 1}</td>
-                    <td className="player"><PlayerName player={row} /></td>
+                    <td className="player"><PlayerName player={row} onClick={() => setSelectedPlayerId(row.id)} /></td>
                     <td>{row.position}</td>
                     <td>{row.matches}</td>
                     <td>{row.attendanceScore}</td>
@@ -228,7 +271,13 @@ function App() {
             <SectionTitle eyebrow="Match Detail" title="특정일 경기 정보" />
             <label className="match-filter">
               <span>경기일정</span>
-              <select value={selectedMatch.id} onChange={(event) => setSelectedMatchId(event.target.value)}>
+              <select
+                value={selectedMatch.id}
+                onChange={(event) => {
+                  setSelectedMatchId(event.target.value);
+                  setActiveMatchTab('summary');
+                }}
+              >
                 {data.matches.map((match) => (
                   <option value={match.id} key={match.id}>
                     {formatDate(match.date)} · {match.venue} · {match.opponent}
@@ -237,7 +286,19 @@ function App() {
               </select>
             </label>
           </div>
-          <div className="match-header">
+          <div className="match-tabs no-export" role="tablist" aria-label="모바일 경기 상세 탭">
+            <button type="button" className={activeMatchTab === 'summary' ? 'active' : ''} onClick={() => setActiveMatchTab('summary')}>
+              경기 요약
+            </button>
+            <button type="button" className={activeMatchTab === 'quarters' ? 'active' : ''} onClick={() => setActiveMatchTab('quarters')}>
+              쿼터 기록
+            </button>
+            <button type="button" className={activeMatchTab === 'players' ? 'active' : ''} onClick={() => setActiveMatchTab('players')}>
+              개인 기록
+            </button>
+          </div>
+
+          <div className={`match-header match-tab-panel ${activeMatchTab === 'summary' ? 'active' : ''}`}>
             <div>
               <span>{formatDate(selectedMatch.date)}</span>
               <h2>{data.club} vs {selectedMatch.opponent}</h2>
@@ -246,13 +307,13 @@ function App() {
             <strong className={resultClass(getResult(selectedMatch))}>{getResult(selectedMatch)}</strong>
           </div>
 
-          <div className="quarter-strip" aria-label="쿼터별 결과">
+          <div className={`quarter-strip match-tab-panel ${activeMatchTab === 'quarters' ? 'active' : ''}`} aria-label="쿼터별 결과">
             {selectedMatch.quarters.map((quarter) => (
               <QuarterCard quarter={quarter} key={quarter.label} />
             ))}
           </div>
 
-          <div className="table-panel match-stats-panel">
+          <div className={`table-panel match-stats-panel match-tab-panel ${activeMatchTab === 'players' ? 'active' : ''}`}>
             <table className="match-stats-table">
               <thead>
                 <tr>
@@ -274,7 +335,7 @@ function App() {
 
                   return (
                     <tr key={player.id}>
-                      <td className="player"><PlayerName player={player} /></td>
+                      <td className="player"><PlayerName player={player} onClick={() => setSelectedPlayerId(player.id)} /></td>
                       <td>{player.position}</td>
                       <td>{stat.attendanceScore ?? 0}</td>
                       <td>{stat.goals ?? 0}</td>
@@ -289,6 +350,8 @@ function App() {
             </table>
           </div>
         </section>
+
+        <PlayerDetailModal detail={selectedPlayerDetail} onClose={() => setSelectedPlayerId(null)} />
       </main>
     </div>
   );
@@ -404,12 +467,84 @@ function AppearanceDots({ appearances = [], total = 8 }) {
   );
 }
 
-function PlayerName({ player }) {
-  return (
-    <span className="player-with-badge">
+function PlayerName({ player, onClick }) {
+  const content = (
+    <>
       {player.name}
       {player.guest ? <span className="guest-badge">용병</span> : null}
-    </span>
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <button className="player-name-button player-with-badge" type="button" onClick={onClick}>
+        {content}
+      </button>
+    );
+  }
+
+  return <span className="player-with-badge">{content}</span>;
+}
+
+function PlayerDetailModal({ detail, onClose }) {
+  if (!detail) return null;
+
+  const { player, season, totalQuarters, matches } = detail;
+  const stats = [
+    { label: '출석', value: season.attendanceScore },
+    { label: '득점', value: season.goals },
+    { label: '어시스트', value: season.assists },
+    { label: '공격P', value: season.points },
+    { label: '출전쿼터', value: totalQuarters },
+    { label: '득실마진', value: formatSigned(season.plusMinus), tone: season.plusMinus >= 0 ? 'positive' : 'negative' },
+  ];
+
+  return (
+    <div className="player-modal-overlay no-export" role="presentation" onClick={onClose}>
+      <article className="player-modal" role="dialog" aria-modal="true" aria-label={`${player.name} 선수 상세 기록`} onClick={(event) => event.stopPropagation()}>
+        <header className="player-modal-head">
+          <div>
+            <div className="player-modal-name">
+              <h2>{player.name}</h2>
+              {player.guest ? <span className="guest-badge">용병</span> : null}
+            </div>
+            <span>2026 SEASON</span>
+          </div>
+          <button className="modal-close" type="button" onClick={onClose} aria-label="선수 상세 닫기">×</button>
+        </header>
+
+        <div className="player-summary-grid">
+          {stats.map((stat) => (
+            <div className="player-summary-item" key={stat.label}>
+              <span>{stat.label}</span>
+              <strong className={stat.tone ?? ''}>{stat.value}</strong>
+            </div>
+          ))}
+        </div>
+
+        <section className="player-match-list">
+          <h3>경기별 기록</h3>
+          {matches.map((match) => (
+            <article className="player-match-row" key={match.id}>
+              <div className="player-match-title">
+                <div>
+                  <span>{formatShortDate(match.date)}</span>
+                  <strong>vs {match.opponent}</strong>
+                </div>
+                <em className={resultClass(match.result)}>{match.result}</em>
+              </div>
+              <div className="player-match-stats">
+                <span>{match.goals}골</span>
+                <span>{match.assists}도움</span>
+                <span>{match.points}P</span>
+                <span>{match.quarters}쿼터</span>
+                <strong className={match.plusMinus >= 0 ? 'positive' : 'negative'}>{formatSigned(match.plusMinus)}</strong>
+              </div>
+            </article>
+          ))}
+        </section>
+      </article>
+    </div>
   );
 }
 
@@ -460,6 +595,69 @@ function buildSeasonStats(data) {
   return rows.sort((a, b) => b.points - a.points || b.goals - a.goals || b.plusMinus - a.plusMinus || a.name.localeCompare(b.name, 'ko-KR'));
 }
 
+function buildPlayerDetail(data, seasonRows, playerId) {
+  const player = data.players.find((item) => item.id === playerId);
+  const season = seasonRows.find((row) => row.id === playerId);
+
+  if (!player || !season) return null;
+
+  const matches = data.matches
+    .map((match) => {
+      const stat = match.playerStats[playerId];
+      const appearances = stat?.appearances ?? [];
+
+      if (!appearances.some(Boolean)) return null;
+
+      const goals = stat.goals ?? 0;
+      const assists = stat.assists ?? 0;
+      const quarters = appearances.filter(Boolean).length;
+      const plusMinus = getPlusMinusFromAppearances(match, appearances);
+
+      return {
+        id: match.id,
+        date: match.date,
+        opponent: match.opponent,
+        result: getResult(match),
+        goals,
+        assists,
+        points: goals + assists,
+        quarters,
+        plusMinus,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  return {
+    player,
+    season,
+    totalQuarters: matches.reduce((total, match) => total + match.quarters, 0),
+    matches,
+  };
+}
+
+function buildRankingRows(rows, metric) {
+  let previousValue = null;
+  let previousRank = 0;
+
+  return rows
+    .filter((row) => row[metric] > 0)
+    .sort((a, b) => b[metric] - a[metric] || b.points - a.points || b.goals - a.goals || b.plusMinus - a.plusMinus || a.name.localeCompare(b.name, 'ko-KR'))
+    .map((row, index) => {
+      const rankValue = row[metric];
+      const rank = rankValue === previousValue ? previousRank : index + 1;
+
+      previousValue = rankValue;
+      previousRank = rank;
+
+      return {
+        ...row,
+        rank,
+        rankValue,
+      };
+    });
+}
+
 function getPlusMinusFromAppearances(match, appearances = []) {
   return match.quarters.reduce((total, quarter, index) => {
     if (!appearances[index]) return total;
@@ -488,8 +686,21 @@ function formatDate(dateString) {
   }).format(new Date(dateString));
 }
 
+function formatShortDate(dateString) {
+  return new Intl.DateTimeFormat('ko-KR', {
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date(dateString));
+}
+
 function formatSigned(value) {
   return value > 0 ? `+${value}` : value;
+}
+
+function formatRankValue(value, metric) {
+  if (metric === 'goals') return `${value}골`;
+  if (metric === 'assists') return `${value}도움`;
+  return `${value}P`;
 }
 
 function toFixed(value) {

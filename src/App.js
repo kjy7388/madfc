@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toPng } from 'html-to-image';
 import madfcLogo from './assets/images/madfc-logo.png';
 import madfcWordmark from './assets/images/madfc-wordmark.png';
+import playerReviews from './data/playerReviews';
 import './index.css';
 
 const seasonData = {
@@ -106,6 +107,8 @@ function App() {
   const recentResults = data.matches.slice(-8).map(getResult);
   const rankingRows = buildRankingRows(visibleSeasonRows, rankingMetric).slice(0, 5);
   const topRankingValue = Math.max(...rankingRows.map((row) => row.rankValue), 1);
+  const selectedMatchPlayers = data.players.filter((player) => selectedMatch.playerStats[player.id]?.appearances?.some(Boolean));
+  const selectedMatchReviews = buildPlayerReviews(selectedMatch, selectedMatchPlayers, playerReviews);
 
   useEffect(() => {
     if (!selectedPlayerDetail) return undefined;
@@ -304,6 +307,9 @@ function App() {
             <button type="button" className={activeMatchTab === 'players' ? 'active' : ''} onClick={() => setActiveMatchTab('players')}>
               개인 기록
             </button>
+            <button type="button" className={activeMatchTab === 'reviews' ? 'active' : ''} onClick={() => setActiveMatchTab('reviews')}>
+              선수 평가
+            </button>
           </div>
 
           <div className={`match-header match-tab-panel ${activeMatchTab === 'summary' ? 'active' : ''}`}>
@@ -336,7 +342,7 @@ function App() {
                 </tr>
               </thead>
               <tbody>
-                {data.players.filter((player) => selectedMatch.playerStats[player.id]?.appearances?.some(Boolean)).map((player) => {
+                {selectedMatchPlayers.map((player) => {
                   const stat = selectedMatch.playerStats[player.id] ?? {};
                   const points = (stat.goals ?? 0) + (stat.assists ?? 0);
                   const plusMinus = getPlusMinusFromAppearances(selectedMatch, stat.appearances);
@@ -357,6 +363,11 @@ function App() {
               </tbody>
             </table>
           </div>
+          <PlayerReviews
+            reviews={selectedMatchReviews}
+            onPlayerClick={(playerId) => setSelectedPlayerId(playerId)}
+            active={activeMatchTab === 'reviews'}
+          />
         </section>
 
         <PlayerDetailModal detail={selectedPlayerDetail} onClose={() => setSelectedPlayerId(null)} />
@@ -494,6 +505,28 @@ function PlayerName({ player, onClick }) {
   return <span className="player-with-badge">{content}</span>;
 }
 
+function PlayerReviews({ reviews, onPlayerClick, active }) {
+  return (
+    <section className={`player-reviews match-tab-panel ${active ? 'active' : ''}`}>
+      <SectionTitle eyebrow="Player Reviews" title="선수별 한줄평" />
+      {reviews.length ? (
+        <div className="player-review-list">
+          {reviews.map(({ player, review }) => (
+            <article className="player-review-item" key={player.id}>
+              <h3>
+                <PlayerName player={player} onClick={() => onPlayerClick(player.id)} />
+              </h3>
+              <p>{review}</p>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p className="player-review-empty">아직 등록된 선수 평가가 없습니다.</p>
+      )}
+    </section>
+  );
+}
+
 function PlayerDetailModal({ detail, onClose }) {
   if (!detail) return null;
 
@@ -554,6 +587,17 @@ function PlayerDetailModal({ detail, onClose }) {
       </article>
     </div>
   );
+}
+
+function buildPlayerReviews(match, matchPlayers, reviewsByMatch) {
+  const reviews = reviewsByMatch[match.id] ?? {};
+
+  return matchPlayers
+    .map((player) => ({
+      player,
+      review: typeof reviews[player.id] === 'string' ? reviews[player.id].trim() : '',
+    }))
+    .filter(({ review }) => review.length > 0);
 }
 
 function buildSummary(data) {

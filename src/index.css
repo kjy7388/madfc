@@ -603,6 +603,45 @@ tbody tr:hover {
   display: none;
 }
 
+.player-reviews {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel-soft);
+}
+
+.player-review-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 18px;
+}
+
+.player-review-item {
+  min-width: 0;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(43, 54, 80, 0.72);
+}
+
+.player-review-item h3 {
+  margin: 0 0 7px;
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.player-review-item p,
+.player-review-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.player-review-empty {
+  padding: 12px 0 2px;
+}
+
 .player-modal-overlay {
   position: fixed;
   inset: 0;
@@ -1450,21 +1489,24 @@ tbody tr:hover {
   .match-tabs,
   .match-header,
   .quarter-strip,
-  .match-stats-panel {
+  .match-stats-panel,
+  .player-reviews {
     width: 100%;
     max-width: 100%;
   }
 
   .match-tabs,
   .match-header,
-  .match-stats-panel {
+  .match-stats-panel,
+  .player-reviews {
     width: min(100%, calc(100dvw - 52px));
     max-width: min(100%, calc(100dvw - 52px));
   }
 
   .match-tabs {
-    width: 321px;
+    width: 100%;
     max-width: 100%;
+    box-sizing: border-box;
   }
 
   .match-section-head {
@@ -1473,7 +1515,7 @@ tbody tr:hover {
 
   .match-tabs {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 4px;
     padding: 4px;
     border: 1px solid var(--line);
@@ -1514,6 +1556,34 @@ tbody tr:hover {
 
   .match-stats-panel.match-tab-panel.active {
     display: block;
+  }
+
+  .player-reviews.match-tab-panel.active {
+    display: block;
+  }
+
+  .player-reviews {
+    padding: 12px;
+  }
+
+  .player-review-list {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .player-review-item {
+    padding: 11px 0;
+  }
+
+  .player-review-item h3 {
+    margin-bottom: 5px;
+    font-size: 0.88rem;
+  }
+
+  .player-review-item p,
+  .player-review-empty {
+    font-size: 0.82rem;
+    line-height: 1.48;
   }
 
   .match-filter {

@@ -6,6 +6,25 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project directory, you can run:
 
+## MAD FC player reviews
+
+Match player reviews are stored in `src/data/playerReviews.js`.
+
+Use the match ID as the first key and the player ID as the second key:
+
+```js
+const playerReviews = {
+  20261003: {
+    p4: '경기별 선수 한줄평을 여기에 작성합니다.',
+    p3: '평가가 등록된 선수만 PLAYER REVIEWS에 표시됩니다.',
+  },
+};
+```
+
+Player IDs are defined in `src/App.js` inside `seasonData.players`.
+Match IDs are defined in `src/App.js` inside `seasonData.matches`.
+If a match has no reviews, the page shows `아직 등록된 선수 평가가 없습니다.`
+
 ### `npm start`
 
 Runs the app in the development mode.\

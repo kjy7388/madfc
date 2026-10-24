@@ -371,8 +371,11 @@ select {
   place-items: center;
   width: 36px;
   height: 36px;
+  padding: 0;
+  border: 0;
   border-radius: 10px;
   color: #fff;
+  font: inherit;
   font-weight: 950;
 }
 
@@ -402,6 +405,95 @@ select {
 
 .match-line strong {
   font-size: 1.35rem;
+}
+
+.recent-form-card {
+  display: flex;
+  flex-direction: column;
+  height: 360px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.recent-form-card .section-title {
+  flex: 0 0 auto;
+}
+
+.recent-match-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-color: #34415a transparent;
+  scrollbar-width: thin;
+}
+
+.recent-match-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.recent-match-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.recent-match-list::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #34415a;
+}
+
+.recent-match-item {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 11px;
+  align-items: center;
+  width: 100%;
+  padding: 12px 4px;
+  border: 0;
+  border-bottom: 1px solid rgba(43, 54, 80, 0.72);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.recent-match-item:first-child {
+  padding-top: 2px;
+}
+
+.recent-match-item:last-child {
+  border-bottom: 0;
+}
+
+.recent-match-item:hover,
+.recent-match-item:focus-visible {
+  border-radius: 10px;
+  background: rgba(63, 134, 255, 0.08);
+  outline: none;
+}
+
+.recent-match-copy {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.recent-match-copy span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.recent-match-copy strong {
+  min-width: 0;
+  color: #ffffff;
+  font-size: 0.96rem;
+  line-height: 1.35;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.mobile-recent-form {
+  display: none;
 }
 
 .rank-line {
@@ -597,6 +689,7 @@ tbody tr:hover {
 .match-section {
   display: grid;
   gap: 16px;
+  scroll-margin-top: 16px;
 }
 
 .match-tabs {
@@ -1258,6 +1351,21 @@ tbody tr:hover {
     font-size: 1.15rem;
   }
 
+  .recent-form-card {
+    display: block;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .recent-match-list {
+    display: none;
+  }
+
+  .mobile-recent-form {
+    display: block;
+  }
+
   .form-row {
     gap: 6px;
     margin-bottom: 10px;
@@ -1268,6 +1376,11 @@ tbody tr:hover {
     height: 30px;
     border-radius: 8px;
     font-size: 0.82rem;
+    cursor: pointer;
+  }
+
+  .form-chip.active {
+    box-shadow: 0 0 0 2px #dfe7f5, 0 0 0 4px rgba(63, 134, 255, 0.22);
   }
 
   .match-line {

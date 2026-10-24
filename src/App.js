@@ -121,9 +121,11 @@ const RANK_METRICS = [
 
 function App() {
   const reportRef = useRef(null);
+  const matchSectionRef = useRef(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const data = seasonData;
   const [selectedMatchId, setSelectedMatchId] = useState(data.matches.at(-1)?.id ?? '');
+  const [selectedRecentMatchId, setSelectedRecentMatchId] = useState(data.matches.at(-1)?.id ?? '');
   const [includeGuests, setIncludeGuests] = useState(false);
   const [rankingMetric, setRankingMetric] = useState('goals');
   const [activeMatchTab, setActiveMatchTab] = useState('summary');
@@ -135,10 +137,21 @@ function App() {
   const summary = buildSummary(data);
   const winRate = summary.matches ? Math.round((summary.wins / summary.matches) * 100) : 0;
   const recentResults = data.matches.slice(-8).map(getResult);
+  const matchesNewestFirst = [...data.matches].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+  const mobileRecentMatches = matchesNewestFirst.slice(0, 3).reverse();
+  const selectedRecentMatch = mobileRecentMatches.find((match) => match.id === selectedRecentMatchId) ?? mobileRecentMatches.at(-1);
   const rankingRows = buildRankingRows(visibleSeasonRows, rankingMetric).slice(0, 5);
   const topRankingValue = Math.max(...rankingRows.map((row) => row.rankValue), 1);
   const selectedMatchPlayers = data.players.filter((player) => selectedMatch.playerStats[player.id]?.appearances?.some(Boolean));
   const selectedMatchReviews = buildPlayerReviews(selectedMatch, selectedMatchPlayers, playerReviews);
+
+  function openMatchDetail(matchId) {
+    setSelectedMatchId(matchId);
+    setActiveMatchTab('summary');
+    window.requestAnimationFrame(() => {
+      matchSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
 
   useEffect(() => {
     if (!selectedPlayerDetail) return undefined;
@@ -232,16 +245,48 @@ function App() {
             </div>
           </article>
 
-          <article className="panel-card">
+          <article className="panel-card recent-form-card">
             <SectionTitle eyebrow="Recent Form" title="최근 전적" />
-            <div className="form-row">
-              {recentResults.map((result, index) => (
-                <span className={`form-chip ${resultClass(result)}`} key={`${result}-${index}`}>{result}</span>
-              ))}
+            <div className="recent-match-list">
+              {matchesNewestFirst.map((match) => {
+                const result = getResult(match);
+
+                return (
+                  <button type="button" className="recent-match-item" onClick={() => openMatchDetail(match.id)} key={match.id}>
+                    <span className={`form-chip ${resultClass(result)}`}>{result}</span>
+                    <span className="recent-match-copy">
+                      <span>{formatDate(match.date)}</span>
+                      <strong>{data.club} {match.teamScore} : {match.opponentScore} {match.opponent}</strong>
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-            <div className="match-line">
-              <span>{formatDate(selectedMatch.date)}</span>
-              <strong>{data.club} {selectedMatch.teamScore} : {selectedMatch.opponentScore} {selectedMatch.opponent}</strong>
+            <div className="mobile-recent-form">
+              <div className="form-row">
+                {mobileRecentMatches.map((match) => {
+                  const result = getResult(match);
+
+                  return (
+                    <button
+                      type="button"
+                      className={`form-chip ${resultClass(result)} ${selectedRecentMatch?.id === match.id ? 'active' : ''}`}
+                      aria-label={`${formatDate(match.date)} ${result}`}
+                      aria-pressed={selectedRecentMatch?.id === match.id}
+                      onClick={() => setSelectedRecentMatchId(match.id)}
+                      key={match.id}
+                    >
+                      {result}
+                    </button>
+                  );
+                })}
+              </div>
+              {selectedRecentMatch ? (
+                <div className="match-line">
+                  <span>{formatDate(selectedRecentMatch.date)}</span>
+                  <strong>{data.club} {selectedRecentMatch.teamScore} : {selectedRecentMatch.opponentScore} {selectedRecentMatch.opponent}</strong>
+                </div>
+              ) : null}
             </div>
           </article>
 
@@ -307,7 +352,7 @@ function App() {
           </div>
         </section>
 
-        <section className="report-section match-section">
+        <section className="report-section match-section" ref={matchSectionRef}>
           <div className="match-section-head">
             <SectionTitle eyebrow="Match Detail" title="특정일 경기 정보" />
             <label className="match-filter">

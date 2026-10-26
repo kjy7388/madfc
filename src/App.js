@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toPng } from 'html-to-image';
 import madfcLogo from './assets/images/madfc-logo.png';
 import madfcWordmark from './assets/images/madfc-wordmark.png';
-import playerReviews from './data/playerReviews';
+import matchAnalyses from './data/playerReviews';
 import './index.css';
 
 const seasonData = {
@@ -143,7 +143,7 @@ function App() {
   const rankingRows = buildRankingRows(visibleSeasonRows, rankingMetric).slice(0, 5);
   const topRankingValue = Math.max(...rankingRows.map((row) => row.rankValue), 1);
   const selectedMatchPlayers = data.players.filter((player) => selectedMatch.playerStats[player.id]?.appearances?.some(Boolean));
-  const selectedMatchReviews = buildPlayerReviews(selectedMatch, selectedMatchPlayers, playerReviews);
+  const selectedMatchAnalysis = buildMatchAnalysis(selectedMatch, selectedMatchPlayers, matchAnalyses);
 
   function openMatchDetail(matchId) {
     setSelectedMatchId(matchId);
@@ -383,7 +383,7 @@ function App() {
               개인 기록
             </button>
             <button type="button" className={activeMatchTab === 'reviews' ? 'active' : ''} onClick={() => setActiveMatchTab('reviews')}>
-              선수 평가
+              경기 분석
             </button>
           </div>
 
@@ -438,10 +438,11 @@ function App() {
               </tbody>
             </table>
           </div>
-          <PlayerReviews
-            reviews={selectedMatchReviews}
+          <MatchAnalysis
+            analysis={selectedMatchAnalysis}
             onPlayerClick={(playerId) => setSelectedPlayerId(playerId)}
             active={activeMatchTab === 'reviews'}
+            key={selectedMatch.id}
           />
         </section>
 
@@ -580,26 +581,99 @@ function PlayerName({ player, onClick }) {
   return <span className="player-with-badge">{content}</span>;
 }
 
-function PlayerReviews({ reviews, onPlayerClick, active }) {
+const REVIEW_COLLAPSE_THRESHOLD = 120;
+const REVIEW_PREVIEW_LENGTH = 92;
+const MATCH_REVIEW_COLLAPSE_THRESHOLD = 200;
+
+function MatchAnalysis({ analysis, onPlayerClick, active }) {
+  const [isMatchReviewExpanded, setIsMatchReviewExpanded] = useState(false);
+  const [expandedPlayerIds, setExpandedPlayerIds] = useState([]);
+  const { matchReview, playerReviews: reviews, nextMatchPlan } = analysis;
+  const hasAnalysis = Boolean(matchReview || reviews.length || nextMatchPlan);
+  const isLongMatchReview = (matchReview?.paragraphs.join('').length ?? 0) > MATCH_REVIEW_COLLAPSE_THRESHOLD;
+
+  function togglePlayerReview(playerId) {
+    setExpandedPlayerIds((current) => (
+      current.includes(playerId)
+        ? current.filter((id) => id !== playerId)
+        : [...current, playerId]
+    ));
+  }
+
   return (
-    <section className={`player-reviews match-tab-panel ${active ? 'active' : ''}`}>
-      <SectionTitle eyebrow="Player Reviews" title="선수별 한줄평" />
+    <section className={`match-analysis match-tab-panel ${active ? 'active' : ''}`}>
+      <SectionTitle eyebrow="Match Analysis" title="경기 분석" />
+      {!hasAnalysis ? <p className="analysis-empty">아직 등록된 경기 분석이 없습니다.</p> : null}
+
+      {matchReview ? (
+        <section className="analysis-block match-review-block">
+          <AnalysisHeading eyebrow="Match Review" title="경기 총평" />
+          <h4>{matchReview.title}</h4>
+          <strong className="analysis-score">{matchReview.result}</strong>
+          <div className={`analysis-copy ${isLongMatchReview && !isMatchReviewExpanded ? 'mobile-collapsed' : ''}`}>
+            {matchReview.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+          </div>
+          {isLongMatchReview ? (
+            <button className="analysis-toggle match-review-toggle" type="button" onClick={() => setIsMatchReviewExpanded((current) => !current)}>
+              {isMatchReviewExpanded ? '접기' : '총평 전체 보기'}
+            </button>
+          ) : null}
+        </section>
+      ) : null}
+
       {reviews.length ? (
-        <div className="player-review-list">
-          {reviews.map(({ player, review }) => (
-            <article className="player-review-item" key={player.id}>
-              <h3>
-                <PlayerName player={player} onClick={() => onPlayerClick(player.id)} />
-              </h3>
-              <p>{review}</p>
-            </article>
-          ))}
-        </div>
-      ) : (
-        <p className="player-review-empty">아직 등록된 선수 평가가 없습니다.</p>
-      )}
+        <section className="analysis-block player-reviews-block">
+          <AnalysisHeading eyebrow="Player Reviews" title="선수별 평가" />
+          <div className="player-review-list">
+            {reviews.map(({ player, review, statLine }) => {
+              const isLongReview = review.length > REVIEW_COLLAPSE_THRESHOLD;
+              const isExpanded = expandedPlayerIds.includes(player.id);
+              const displayedReview = isLongReview && !isExpanded ? createReviewPreview(review) : review;
+
+              return (
+                <article className="player-review-item" key={player.id}>
+                  <h3>
+                    <PlayerName player={player} onClick={() => onPlayerClick(player.id)} />
+                  </h3>
+                  <p className="player-review-stat">{statLine}</p>
+                  <p className="player-review-text">{displayedReview}</p>
+                  {isLongReview ? (
+                    <button className="analysis-toggle" type="button" onClick={() => togglePlayerReview(player.id)}>
+                      {isExpanded ? '접기 ▲' : '자세히 보기 ▼'}
+                    </button>
+                  ) : null}
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+
+      {nextMatchPlan ? (
+        <section className="analysis-block next-match-plan-block">
+          <AnalysisHeading eyebrow="Next Match Plan" title="다음 맞대결 운영 방향" />
+          <h4>{nextMatchPlan.title}</h4>
+          <div className="analysis-copy">
+            {nextMatchPlan.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+          </div>
+        </section>
+      ) : null}
     </section>
   );
+}
+
+function AnalysisHeading({ eyebrow, title }) {
+  return (
+    <header className="analysis-heading">
+      <span>{eyebrow}</span>
+      <h3>{title}</h3>
+    </header>
+  );
+}
+
+function createReviewPreview(review) {
+  if (review.length <= REVIEW_PREVIEW_LENGTH) return review;
+  return `${review.slice(0, REVIEW_PREVIEW_LENGTH).trim()}…`;
 }
 
 function PlayerDetailModal({ detail, onClose }) {
@@ -664,15 +738,31 @@ function PlayerDetailModal({ detail, onClose }) {
   );
 }
 
-function buildPlayerReviews(match, matchPlayers, reviewsByMatch) {
-  const reviews = reviewsByMatch[match.id] ?? {};
-
-  return matchPlayers
+function buildMatchAnalysis(match, matchPlayers, analysesByMatch) {
+  const analysis = analysesByMatch[match.id] ?? {};
+  const reviews = analysis.playerReviews ?? {};
+  const playerReviews = matchPlayers
     .map((player) => ({
       player,
       review: typeof reviews[player.id] === 'string' ? reviews[player.id].trim() : '',
+      statLine: buildMatchStatLine(match, player.id),
     }))
     .filter(({ review }) => review.length > 0);
+
+  return {
+    matchReview: analysis.matchReview ?? null,
+    playerReviews,
+    nextMatchPlan: analysis.nextMatchPlan ?? null,
+  };
+}
+
+function buildMatchStatLine(match, playerId) {
+  const stat = match.playerStats[playerId] ?? {};
+  const appearances = stat.appearances ?? [];
+  const quarters = appearances.filter(Boolean).length;
+  const plusMinus = getPlusMinusFromAppearances(match, appearances);
+
+  return `${stat.goals ?? 0}골 · ${stat.assists ?? 0}어시 · ${quarters}쿼터 · 득실마진 ${formatSigned(plusMinus)}`;
 }
 
 function buildSummary(data) {

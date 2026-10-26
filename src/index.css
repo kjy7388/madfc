@@ -696,11 +696,64 @@ tbody tr:hover {
   display: none;
 }
 
-.player-reviews {
+.match-analysis {
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--panel-soft);
+}
+
+.analysis-block + .analysis-block {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(43, 54, 80, 0.82);
+}
+
+.analysis-heading {
+  margin-bottom: 12px;
+}
+
+.analysis-heading span {
+  color: #9db9e9;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.analysis-heading h3 {
+  margin: 5px 0 0;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.analysis-block h4 {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.analysis-score {
+  display: block;
+  margin-bottom: 13px;
+  color: var(--blue);
+  font-size: 0.94rem;
+}
+
+.analysis-copy {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.analysis-copy p {
+  margin: 0;
+}
+
+.analysis-copy p + p {
+  margin-top: 11px;
 }
 
 .player-review-list {
@@ -721,8 +774,8 @@ tbody tr:hover {
   font-size: 0.95rem;
 }
 
-.player-review-item p,
-.player-review-empty {
+.player-review-text,
+.analysis-empty {
   margin: 0;
   color: var(--muted);
   font-size: 0.9rem;
@@ -731,8 +784,40 @@ tbody tr:hover {
   overflow-wrap: anywhere;
 }
 
-.player-review-empty {
+.player-review-stat {
+  margin: 0 0 8px;
+  color: #9db9e9;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.analysis-empty {
   padding: 12px 0 2px;
+}
+
+.analysis-toggle {
+  margin-top: 9px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--blue);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.analysis-toggle:hover,
+.analysis-toggle:focus-visible {
+  color: #8db7ff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  outline: none;
+}
+
+.match-review-toggle {
+  display: none;
 }
 
 .player-modal-overlay {
@@ -946,6 +1031,21 @@ tbody tr:hover {
   background: rgba(40, 199, 111, 0.16);
   color: var(--green);
   font-size: 1.85rem;
+}
+
+.match-header strong.win {
+  background: rgba(40, 199, 111, 0.16);
+  color: var(--green);
+}
+
+.match-header strong.draw {
+  background: rgba(139, 149, 167, 0.18);
+  color: #c0c7d2;
+}
+
+.match-header strong.loss {
+  background: rgba(255, 91, 105, 0.16);
+  color: var(--red);
 }
 
 .quarter-strip {
@@ -1603,7 +1703,7 @@ tbody tr:hover {
   .match-header,
   .quarter-strip,
   .match-stats-panel,
-  .player-reviews {
+  .match-analysis {
     width: 100%;
     max-width: 100%;
   }
@@ -1611,7 +1711,7 @@ tbody tr:hover {
   .match-tabs,
   .match-header,
   .match-stats-panel,
-  .player-reviews {
+  .match-analysis {
     width: min(100%, calc(100dvw - 52px));
     max-width: min(100%, calc(100dvw - 52px));
   }
@@ -1671,12 +1771,39 @@ tbody tr:hover {
     display: block;
   }
 
-  .player-reviews.match-tab-panel.active {
+  .match-analysis.match-tab-panel.active {
     display: block;
   }
 
-  .player-reviews {
+  .match-analysis {
     padding: 12px;
+  }
+
+  .analysis-block + .analysis-block {
+    margin-top: 15px;
+    padding-top: 15px;
+  }
+
+  .analysis-heading {
+    margin-bottom: 10px;
+  }
+
+  .analysis-heading h3,
+  .analysis-block h4 {
+    font-size: 0.9rem;
+  }
+
+  .analysis-copy {
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+
+  .analysis-copy.mobile-collapsed p:nth-child(n + 2) {
+    display: none;
+  }
+
+  .match-review-toggle {
+    display: inline-block;
   }
 
   .player-review-list {
@@ -1693,10 +1820,14 @@ tbody tr:hover {
     font-size: 0.88rem;
   }
 
-  .player-review-item p,
-  .player-review-empty {
+  .player-review-text,
+  .analysis-empty {
     font-size: 0.82rem;
     line-height: 1.48;
+  }
+
+  .player-review-stat {
+    font-size: 0.72rem;
   }
 
   .match-filter {
@@ -1739,21 +1870,6 @@ tbody tr:hover {
     width: 44px;
     height: 44px;
     font-size: 1.18rem;
-  }
-
-  .match-header strong.win {
-    background: rgba(40, 199, 111, 0.16);
-    color: var(--green);
-  }
-
-  .match-header strong.draw {
-    background: rgba(139, 149, 167, 0.18);
-    color: #c0c7d2;
-  }
-
-  .match-header strong.loss {
-    background: rgba(255, 91, 105, 0.16);
-    color: var(--red);
   }
 
   .quarter-strip {

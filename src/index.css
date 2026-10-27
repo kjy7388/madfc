@@ -175,6 +175,20 @@ select {
   opacity: 0.72;
 }
 
+.internal-match-link {
+  color: #cfe0ff;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.internal-match-link:hover,
+.internal-match-link:focus-visible {
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 .stats-filter-row {
   display: flex;
   justify-content: flex-end;

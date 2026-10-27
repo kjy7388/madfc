@@ -3,6 +3,7 @@ import { toPng } from 'html-to-image';
 import madfcLogo from './assets/images/madfc-logo.png';
 import madfcWordmark from './assets/images/madfc-wordmark.png';
 import matchAnalyses from './data/playerReviews';
+import InternalMatch from './InternalMatch';
 import './index.css';
 
 const seasonData = {
@@ -193,6 +194,10 @@ function App() {
     }
   }
 
+  if (window.location.pathname.replace(/\/+$/, '') === '/internal-match') {
+    return <InternalMatch players={data.players} />;
+  }
+
   return (
     <div className="export-stage">
       <main className="mad-page" ref={reportRef}>
@@ -208,6 +213,7 @@ function App() {
 
           <div className="hero-actions">
             <span className="season-badge">2026 SEASON</span>
+            <a className="internal-match-link no-export" href="/internal-match">자체전 스코어보드</a>
             <button className="download-button no-export" type="button" onClick={downloadImage} disabled={isDownloading}>
               {isDownloading ? '이미지 생성 중' : '이미지 다운로드'}
             </button>

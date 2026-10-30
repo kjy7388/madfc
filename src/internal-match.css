@@ -108,7 +108,8 @@
 .copy-fallback { width: 100%; min-height: 240px; margin-top: 10px; padding: 12px; border: 1px solid var(--blue); border-radius: 10px; background: #0c1320; color: var(--text); font: 0.78rem/1.5 monospace; }
 .storage-notice { margin: 12px 0 0; color: var(--muted); font-size: 0.72rem; line-height: 1.5; text-align: center; }
 
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 769px) and (max-width: 1024px),
+  (min-width: 1025px) and (max-width: 1194px) and (orientation: landscape) {
   .internal-page {
     padding: 10px 12px 28px;
   }

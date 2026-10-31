@@ -810,6 +810,67 @@ tbody tr:hover {
   padding: 12px 0 2px;
 }
 
+.internal-team-review-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.internal-team-review-card {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid rgba(63, 134, 255, 0.34);
+  border-radius: 12px;
+  background: rgba(63, 134, 255, 0.07);
+}
+
+.internal-team-review-card.team-b {
+  border-color: rgba(255, 91, 105, 0.3);
+  background: rgba(255, 91, 105, 0.06);
+}
+
+.internal-team-review-card > header > span {
+  color: var(--blue);
+  font-size: 0.7rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+}
+
+.internal-team-review-card.team-b > header > span {
+  color: var(--red);
+}
+
+.internal-team-review-card > header h4 {
+  margin: 5px 0 11px;
+  line-height: 1.45;
+}
+
+.internal-team-review-toggle {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 14px;
+  border: 1px solid rgba(63, 134, 255, 0.38);
+  border-radius: 9px;
+  background: rgba(63, 134, 255, 0.12);
+  color: #cfe0ff;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.team-b .internal-team-review-toggle {
+  border-color: rgba(255, 91, 105, 0.34);
+  background: rgba(255, 91, 105, 0.1);
+  color: #ffc6cb;
+}
+
+.internal-player-review-list {
+  margin-top: 6px;
+}
+
+.internal-player-review-list .player-review-item:last-child {
+  border-bottom: 0;
+}
+
 .analysis-toggle {
   margin-top: 9px;
   padding: 0;
@@ -1917,6 +1978,14 @@ tbody tr:hover {
   .player-review-list {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .internal-team-review-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .internal-team-review-card {
+    padding: 12px;
   }
 
   .player-review-item {

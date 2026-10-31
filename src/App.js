@@ -18,7 +18,7 @@ export const seasonData = {
     { id: 'p5', name: '이현규', position: 'DF', guest: true },
     { id: 'p6', name: '전창욱', position: 'MF' },
     { id: 'p7', name: '박진규', position: 'FW' },
-    { id: 'p8', name: '대영', position: 'FW', guest: true },
+    { id: 'p8', name: '전대영', position: 'FW', guest: true },
     { id: 'p9', name: '이동섭', position: 'DF' },
     { id: 'p10', name: '조도연', position: 'FW' },
     { id: 'p11', name: '유재홍', position: 'MF' },
@@ -26,7 +26,7 @@ export const seasonData = {
     { id: 'p13', name: '허진강', position: 'DF', guest: true },
     { id: 'p14', name: '류경상', position: 'FW', guest: true },
     { id: 'p15', name: '정세영', position: 'FW', guest: true },
-    { id: 'p16', name: '연규', position: 'MF', guest: true },
+    { id: 'p16', name: '정연규', position: 'MF', guest: true },
   ],
   matches: [
     {
@@ -37,13 +37,13 @@ export const seasonData = {
       teamScore: 21,
       opponentScore: 12,
       quarters: [
-        { label: '1쿼터', cumulativeScore: '3:1', players: ['김장엽', '이현규', '고유순', '대영', '최용호'], for: 3, against: 1, events: [{ type: 'goal', scorer: '김장엽', assist: '최용호' }, { type: 'goal', scorer: '고유순', assist: '이현규' }, { type: 'goal', scorer: '고유순', assist: '이현규' }, { type: 'against' }] },
-        { label: '2쿼터', cumulativeScore: '4:5', players: ['박경민', '전창욱', '박진규', '대영', '최용호'], for: 1, against: 4, events: [{ type: 'against' }, { type: 'against' }, { type: 'against' }, { type: 'goal', scorer: '최용호' }, { type: 'against' }] },
+        { label: '1쿼터', cumulativeScore: '3:1', players: ['김장엽', '이현규', '고유순', '전대영', '최용호'], for: 3, against: 1, events: [{ type: 'goal', scorer: '김장엽', assist: '최용호' }, { type: 'goal', scorer: '고유순', assist: '이현규' }, { type: 'goal', scorer: '고유순', assist: '이현규' }, { type: 'against' }] },
+        { label: '2쿼터', cumulativeScore: '4:5', players: ['박경민', '전창욱', '박진규', '전대영', '최용호'], for: 1, against: 4, events: [{ type: 'against' }, { type: 'against' }, { type: 'against' }, { type: 'goal', scorer: '최용호' }, { type: 'against' }] },
         { label: '3쿼터', cumulativeScore: '10:5', players: ['최용호', '박경민', '이현규', '김장엽', '고유순'], for: 6, against: 0, events: [{ type: 'goal', scorer: '박경민' }, { type: 'goal', scorer: '최용호', assist: '박경민' }, { type: 'goal', scorer: '이현규' }, { type: 'goal', scorer: '박경민' }, { type: 'goal', scorer: '박경민', assist: '최용호' }, { type: 'goal', scorer: '최용호', assist: '박경민' }] },
-        { label: '4쿼터', cumulativeScore: '14:6', players: ['박진규', '전창욱', '김장엽', '대영', '이현규'], for: 4, against: 1, events: [{ type: 'goal', scorer: '김장엽', assist: '전창욱' }, { type: 'goal', scorer: '김장엽', assist: '박진규' }, { type: 'goal', scorer: '이현규' }, { type: 'goal', scorer: '전창욱', assist: '김장엽' }, { type: 'against' }] },
-        { label: '5쿼터', cumulativeScore: '15:6', players: ['이현규', '최용호', '고유순', '박경민', '대영'], for: 1, against: 0, events: [{ type: 'goal', scorer: '고유순', assist: '최용호' }] },
-        { label: '6쿼터', cumulativeScore: '15:8', players: ['박진규', '김장엽', '대영', '전창욱', '고유순'], for: 0, against: 2, events: [{ type: 'against' }, { type: 'against' }] },
-        { label: '7쿼터', cumulativeScore: '17:11', players: ['최용호', '고유순', '전창욱', '대영', '박경민'], for: 2, against: 3, events: [{ type: 'goal', scorer: '고유순', assist: '최용호' }, { type: 'against' }, { type: 'against' }, { type: 'against' }, { type: 'goal', scorer: '전창욱' }] },
+        { label: '4쿼터', cumulativeScore: '14:6', players: ['박진규', '전창욱', '김장엽', '전대영', '이현규'], for: 4, against: 1, events: [{ type: 'goal', scorer: '김장엽', assist: '전창욱' }, { type: 'goal', scorer: '김장엽', assist: '박진규' }, { type: 'goal', scorer: '이현규' }, { type: 'goal', scorer: '전창욱', assist: '김장엽' }, { type: 'against' }] },
+        { label: '5쿼터', cumulativeScore: '15:6', players: ['이현규', '최용호', '고유순', '박경민', '전대영'], for: 1, against: 0, events: [{ type: 'goal', scorer: '고유순', assist: '최용호' }] },
+        { label: '6쿼터', cumulativeScore: '15:8', players: ['박진규', '김장엽', '전대영', '전창욱', '고유순'], for: 0, against: 2, events: [{ type: 'against' }, { type: 'against' }] },
+        { label: '7쿼터', cumulativeScore: '17:11', players: ['최용호', '고유순', '전창욱', '전대영', '박경민'], for: 2, against: 3, events: [{ type: 'goal', scorer: '고유순', assist: '최용호' }, { type: 'against' }, { type: 'against' }, { type: 'against' }, { type: 'goal', scorer: '전창욱' }] },
         { label: '8쿼터', cumulativeScore: '21:12', players: ['박진규', '최용호', '김장엽', '고유순', '박경민'], for: 4, against: 1, events: [{ type: 'goal', scorer: '박경민', assist: '김장엽' }, { type: 'goal', scorer: '박진규' }, { type: 'goal', scorer: '박경민', assist: '박진규' }, { type: 'goal', scorer: '고유순', assist: '박경민' }, { type: 'against' }] },
       ],
       playerStats: {
@@ -93,12 +93,12 @@ export const seasonData = {
       opponentScore: 12,
       quarters: [
         { label: '1쿼터', cumulativeScore: '2:2', players: ['고유순', '김장엽', '유재홍', '허진강', '정세영', '박진규'], for: 2, against: 2, events: [{ type: 'against' }, { type: 'goal', scorer: '김장엽', assist: '허진강' }, { type: 'against' }, { type: 'goal', scorer: '정세영' }] },
-        { label: '2쿼터', cumulativeScore: '2:3', players: ['박경민', '연규', '박진규', '고유순', '허진강', '대영'], for: 0, against: 1, events: [{ type: 'against' }] },
-        { label: '3쿼터', cumulativeScore: '3:7', players: ['유재홍', '정세영', '대영', '박경민', '연규', '김장엽'], for: 1, against: 4, events: [{ type: 'against' }, { type: 'against' }, { type: 'against' }, { type: 'against' }, { type: 'goal', scorer: '김장엽', assist: '정세영' }] },
+        { label: '2쿼터', cumulativeScore: '2:3', players: ['박경민', '정연규', '박진규', '고유순', '허진강', '전대영'], for: 0, against: 1, events: [{ type: 'against' }] },
+        { label: '3쿼터', cumulativeScore: '3:7', players: ['유재홍', '정세영', '전대영', '박경민', '정연규', '김장엽'], for: 1, against: 4, events: [{ type: 'against' }, { type: 'against' }, { type: 'against' }, { type: 'against' }, { type: 'goal', scorer: '김장엽', assist: '정세영' }] },
         { label: '4쿼터', cumulativeScore: '3:9', players: ['박진규', '고유순', '허진강', '정세영', '김장엽', '유재홍'], for: 0, against: 2, events: [{ type: 'against' }, { type: 'against' }] },
-        { label: '5쿼터', cumulativeScore: '3:10', players: ['박진규', '허진강', '연규', '대영', '유재홍', '고유순'], for: 0, against: 1, events: [{ type: 'against' }] },
-        { label: '6쿼터', cumulativeScore: '6:10', players: ['정세영', '허진강', '고유순', '대영', '김장엽', '연규'], for: 3, against: 0, events: [{ type: 'goal', scorer: '허진강' }, { type: 'goal', scorer: '정세영', assist: '연규' }, { type: 'goal', scorer: '연규', assist: '정세영' }] },
-        { label: '7쿼터', cumulativeScore: '7:12', players: ['유재홍', '김장엽', '허진강', '정세영', '대영', '고유순'], for: 1, against: 2, events: [{ type: 'goal', scorer: '정세영' }, { type: 'against' }, { type: 'against' }] },
+        { label: '5쿼터', cumulativeScore: '3:10', players: ['박진규', '허진강', '정연규', '전대영', '유재홍', '고유순'], for: 0, against: 1, events: [{ type: 'against' }] },
+        { label: '6쿼터', cumulativeScore: '6:10', players: ['정세영', '허진강', '고유순', '전대영', '김장엽', '정연규'], for: 3, against: 0, events: [{ type: 'goal', scorer: '허진강' }, { type: 'goal', scorer: '정세영', assist: '정연규' }, { type: 'goal', scorer: '정연규', assist: '정세영' }] },
+        { label: '7쿼터', cumulativeScore: '7:12', players: ['유재홍', '김장엽', '허진강', '정세영', '전대영', '고유순'], for: 1, against: 2, events: [{ type: 'goal', scorer: '정세영' }, { type: 'against' }, { type: 'against' }] },
       ],
       playerStats: {
         p1: { attendanceScore: 1, goals: 0, assists: 0, appearances: [false, true, true, false, false, false, false] },
@@ -646,8 +646,9 @@ const MATCH_REVIEW_COLLAPSE_THRESHOLD = 200;
 function MatchAnalysis({ analysis, onPlayerClick, active }) {
   const [isMatchReviewExpanded, setIsMatchReviewExpanded] = useState(false);
   const [expandedPlayerIds, setExpandedPlayerIds] = useState([]);
-  const { matchReview, playerReviews: reviews, nextMatchPlan } = analysis;
-  const hasAnalysis = Boolean(matchReview || reviews.length || nextMatchPlan);
+  const [expandedTeams, setExpandedTeams] = useState([]);
+  const { matchReview, playerReviews: reviews, teamReviews, nextMatchPlan } = analysis;
+  const hasAnalysis = Boolean(matchReview || reviews.length || teamReviews.length || nextMatchPlan);
   const isLongMatchReview = (matchReview?.paragraphs.join('').length ?? 0) > MATCH_REVIEW_COLLAPSE_THRESHOLD;
 
   function togglePlayerReview(playerId) {
@@ -655,6 +656,14 @@ function MatchAnalysis({ analysis, onPlayerClick, active }) {
       current.includes(playerId)
         ? current.filter((id) => id !== playerId)
         : [...current, playerId]
+    ));
+  }
+
+  function toggleTeamReviews(team) {
+    setExpandedTeams((current) => (
+      current.includes(team)
+        ? current.filter((item) => item !== team)
+        : [...current, team]
     ));
   }
 
@@ -676,6 +685,39 @@ function MatchAnalysis({ analysis, onPlayerClick, active }) {
               {isMatchReviewExpanded ? '접기' : '총평 전체 보기'}
             </button>
           ) : null}
+        </section>
+      ) : null}
+
+      {teamReviews.length ? (
+        <section className="analysis-block internal-team-reviews-block">
+          <AnalysisHeading eyebrow="Team Reviews" title="팀별 총평" />
+          <div className="internal-team-review-grid">
+            {teamReviews.map((teamReview) => {
+              const isExpanded = expandedTeams.includes(teamReview.team);
+              return (
+                <article className={`internal-team-review-card team-${teamReview.team.toLowerCase()}`} key={teamReview.team}>
+                  <header><span>{teamReview.team} TEAM</span><h4>{teamReview.title}</h4></header>
+                  <div className="analysis-copy">
+                    {teamReview.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+                  </div>
+                  <button className="internal-team-review-toggle" type="button" aria-expanded={isExpanded} onClick={() => toggleTeamReviews(teamReview.team)}>
+                    {teamReview.team === 'A' ? '🔵' : '🔴'} {teamReview.team}팀 선수별 평가 {isExpanded ? '접기 ▲' : '펼치기 ▼'}
+                  </button>
+                  {isExpanded ? (
+                    <div className="internal-player-review-list">
+                      {teamReview.playerReviews.map(({ player, displayName, review, statLine }) => (
+                        <article className="player-review-item" key={player.id}>
+                          <h3><PlayerName player={{ ...player, name: displayName ?? player.name }} onClick={() => onPlayerClick(player.id)} /></h3>
+                          <p className="player-review-stat">{statLine}</p>
+                          <p className="player-review-text">{review}</p>
+                        </article>
+                      ))}
+                    </div>
+                  ) : null}
+                </article>
+              );
+            })}
+          </div>
         </section>
       ) : null}
 
@@ -806,10 +848,28 @@ function buildMatchAnalysis(match, matchPlayers, analysesByMatch) {
       statLine: buildMatchStatLine(match, player.id),
     }))
     .filter(({ review }) => review.length > 0);
+  const teamReviews = Object.entries(analysis.teamReviews ?? {}).map(([team, teamReview]) => ({
+    team,
+    title: teamReview.title,
+    paragraphs: teamReview.paragraphs ?? [],
+    playerReviews: Object.entries(teamReview.playerReviews ?? {}).map(([playerId, reviewData]) => {
+      const player = matchPlayers.find((item) => item.id === playerId);
+      const review = typeof reviewData === 'string' ? reviewData : reviewData.review;
+      const displayName = typeof reviewData === 'string' ? null : reviewData.displayName;
+      const stat = match.playerStats[playerId] ?? {};
+      return player ? {
+        player,
+        displayName,
+        review,
+        statLine: `${stat.goals ?? 0}골 · ${stat.assists ?? 0}도움`,
+      } : null;
+    }).filter(Boolean),
+  }));
 
   return {
     matchReview: analysis.matchReview ?? null,
     playerReviews,
+    teamReviews,
     nextMatchPlan: analysis.nextMatchPlan ?? null,
   };
 }

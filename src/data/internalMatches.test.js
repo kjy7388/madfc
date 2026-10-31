@@ -1,4 +1,5 @@
 import internalMatches from './internalMatches';
+import matchAnalyses from './playerReviews';
 import { buildSummary, seasonData } from '../App';
 
 test('2026-10-31 internal match totals are derived correctly', () => {
@@ -38,4 +39,21 @@ test('internal matches are excluded from official season summary', () => {
     draws: 0,
     losses: 1,
   });
+});
+
+test('internal match analysis uses player ids without changing match records', () => {
+  const analysis = matchAnalyses['internal-20261031'];
+  expect(Object.keys(analysis.teamReviews.A.playerReviews)).toHaveLength(5);
+  expect(Object.keys(analysis.teamReviews.B.playerReviews)).toHaveLength(6);
+  expect(internalMatches[0]).toMatchObject({ teamScore: 22, opponentScore: 19 });
+  expect(internalMatches[0].quarters[0]).toMatchObject({ for: 0, against: 0 });
+  expect(internalMatches[0].quarters[1]).toMatchObject({ for: 0, against: 0 });
+});
+
+test('canonical names keep the existing player ids and records', () => {
+  expect(seasonData.players.find((player) => player.id === 'p16')?.name).toBe('정연규');
+  expect(seasonData.players.find((player) => player.id === 'p8')?.name).toBe('전대영');
+  expect(seasonData.players.filter((player) => ['정연규', '전대영'].includes(player.name))).toHaveLength(2);
+  expect(seasonData.matches.find((match) => match.id === '20261024')?.playerStats.p16).toMatchObject({ goals: 1, assists: 1 });
+  expect(internalMatches[0].playerStats.p16).toMatchObject({ goals: 4, assists: 1 });
 });

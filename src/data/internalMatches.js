@@ -50,6 +50,17 @@ const defaultTeams = {
   p7: 'B', p9: 'B', p11: 'B', p13: 'B', p6: 'B', p10: 'B',
 };
 
+const attendanceRecords = {
+  p1: { attended: true, attendanceStatus: 'present', attendanceScore: 3 },
+  p3: { attended: true, attendanceStatus: 'present', attendanceScore: 3 },
+  p4: { attended: true, attendanceStatus: 'present', attendanceScore: 3 },
+  p6: { attended: true, attendanceStatus: 'late', attendanceScore: 1 },
+  p7: { attended: true, attendanceStatus: 'present', attendanceScore: 3 },
+  p9: { attended: true, attendanceStatus: 'present', attendanceScore: 3 },
+  p10: { attended: true, attendanceStatus: 'present', attendanceScore: 3 },
+  p11: { attended: true, attendanceStatus: 'late', attendanceScore: 1 },
+};
+
 function buildPlayerStats(quarters) {
   const stats = {};
 
@@ -66,6 +77,10 @@ function buildPlayerStats(quarters) {
 
   Object.entries(defaultTeams).forEach(([playerId, team]) => {
     stats[playerId] ??= { team, goals: 0, assists: 0 };
+  });
+
+  Object.entries(attendanceRecords).forEach(([playerId, attendance]) => {
+    stats[playerId] = { ...stats[playerId], ...attendance };
   });
 
   return stats;

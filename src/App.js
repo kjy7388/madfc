@@ -134,6 +134,7 @@ function App() {
   const [rankingMetric, setRankingMetric] = useState('goals');
   const [activeMatchTab, setActiveMatchTab] = useState('summary');
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
+  const [isStatsInfoOpen, setIsStatsInfoOpen] = useState(false);
   const selectedMatch = data.matches.find((match) => match.id === selectedMatchId) ?? data.matches.at(-1);
   const seasonRows = buildSeasonStats(data);
   const selectedPlayerDetail = selectedPlayerId ? buildPlayerDetail(data, seasonRows, selectedPlayerId) : null;
@@ -185,6 +186,22 @@ function App() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [selectedPlayerDetail]);
+
+  useEffect(() => {
+    if (!isStatsInfoOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') setIsStatsInfoOpen(false);
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isStatsInfoOpen]);
 
   async function downloadImage() {
     if (!reportRef.current) return;
@@ -335,7 +352,10 @@ function App() {
         </section>
 
         <section className="report-section">
-          <SectionTitle eyebrow="Season Total" title="전체 누적 스탯" />
+          <div className="season-total-head">
+            <SectionTitle eyebrow="Season Total" title="전체 누적 스탯" />
+            <button className="stats-info-button no-export" type="button" onClick={() => setIsStatsInfoOpen(true)} aria-haspopup="dialog">ⓘ 통계 기준</button>
+          </div>
           <div className="table-panel">
             <table>
               <thead>
@@ -485,6 +505,7 @@ function App() {
         </section>
 
         <PlayerDetailModal detail={selectedPlayerDetail} onClose={() => setSelectedPlayerId(null)} />
+        {isStatsInfoOpen ? <StatsInfoModal onClose={() => setIsStatsInfoOpen(false)} /> : null}
       </main>
     </div>
   );
@@ -776,6 +797,28 @@ function createReviewPreview(review) {
   return `${review.slice(0, REVIEW_PREVIEW_LENGTH).trim()}…`;
 }
 
+function StatsInfoModal({ onClose }) {
+  return (
+    <div className="stats-info-overlay no-export" role="presentation" onClick={onClose}>
+      <article className="stats-info-modal" role="dialog" aria-modal="true" aria-labelledby="stats-info-title" onClick={(event) => event.stopPropagation()}>
+        <header>
+          <div><span>STAT POLICY</span><h2 id="stats-info-title">MAD FC 누적 스탯 반영 기준</h2></div>
+          <button type="button" onClick={onClose} aria-label="통계 반영 기준 닫기">×</button>
+        </header>
+        <section><h3>① 경기 수</h3><p>외부전과 자체전 모두 포함합니다. 정식 회원이 실제 참석한 경기만 인정하며, 한 경기당 1회로 계산합니다.</p></section>
+        <section>
+          <h3>② 출석점수</h3><p>외부전과 자체전 모두 포함합니다.</p>
+          <ul><li>정상출석: 3점</li><li>불참투표 후 참석변경: 2점</li><li>지각: 1점</li><li>불참: 0점</li></ul>
+          <p>용병은 출석점수 집계에서 제외합니다.</p>
+        </section>
+        <section><h3>③ 공격 기록</h3><p>득점, 어시스트, 공격포인트 및 득실마진은 외부전 기록만 반영합니다.</p><p>자체전 공격 기록은 자체전 경기 상세 페이지에서 별도로 확인할 수 있습니다.</p></section>
+        <section><h3>④ 경기당 평균</h3><p>경기당 평균 득점·어시스트·공격포인트는 외부전 경기 수를 기준으로 계산합니다.</p></section>
+        <button className="stats-info-close" type="button" onClick={onClose}>닫기</button>
+      </article>
+    </div>
+  );
+}
+
 function PlayerDetailModal({ detail, onClose }) {
   if (!detail) return null;
 
@@ -904,30 +947,63 @@ export function buildSummary(data) {
   );
 }
 
-function buildSeasonStats(data) {
+export function buildSeasonStats(data) {
   const rows = data.players.map((player) => ({
     ...player,
     matches: 0,
+    externalMatches: 0,
+    internalMatches: 0,
     attendanceScore: 0,
+    externalAttendanceScore: 0,
+    internalAttendanceScore: 0,
     goals: 0,
     assists: 0,
     points: 0,
     plusMinus: 0,
+    averageGoals: 0,
+    averageAssists: 0,
+    averagePoints: 0,
   }));
   const rowsById = Object.fromEntries(rows.map((row) => [row.id, row]));
+  const countedMatches = Object.fromEntries(rows.map((row) => [row.id, new Set()]));
 
   data.matches.filter((match) => !isInternalMatch(match)).forEach((match) => {
     Object.entries(match.playerStats).forEach(([playerId, stat]) => {
       const row = rowsById[playerId];
       if (!row) return;
 
-      row.matches += stat.appearances?.some(Boolean) ? 1 : 0;
+      if (stat.appearances?.some(Boolean) && !countedMatches[playerId].has(match.id)) {
+        row.matches += 1;
+        row.externalMatches += 1;
+        countedMatches[playerId].add(match.id);
+      }
       row.attendanceScore += stat.attendanceScore ?? 0;
+      row.externalAttendanceScore += stat.attendanceScore ?? 0;
       row.goals += stat.goals ?? 0;
       row.assists += stat.assists ?? 0;
       row.points += (stat.goals ?? 0) + (stat.assists ?? 0);
       row.plusMinus += getPlusMinusFromAppearances(match, stat.appearances);
     });
+  });
+
+  data.matches.filter(isInternalMatch).forEach((match) => {
+    Object.entries(match.playerStats).forEach(([playerId, stat]) => {
+      const row = rowsById[playerId];
+      if (!row || row.guest || stat.attended !== true || countedMatches[playerId].has(match.id)) return;
+
+      row.matches += 1;
+      row.internalMatches += 1;
+      row.attendanceScore += stat.attendanceScore ?? 0;
+      row.internalAttendanceScore += stat.attendanceScore ?? 0;
+      countedMatches[playerId].add(match.id);
+    });
+  });
+
+  rows.forEach((row) => {
+    if (!row.externalMatches) return;
+    row.averageGoals = row.goals / row.externalMatches;
+    row.averageAssists = row.assists / row.externalMatches;
+    row.averagePoints = row.points / row.externalMatches;
   });
 
   return rows.sort((a, b) => b.points - a.points || b.goals - a.goals || b.plusMinus - a.plusMinus || a.name.localeCompare(b.name, 'ko-KR'));

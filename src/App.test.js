@@ -36,3 +36,12 @@ test('uses canonical player names without creating duplicate players', () => {
   expect(screen.queryByText(/^연규$/)).not.toBeInTheDocument();
   expect(screen.queryByText(/^대영$/)).not.toBeInTheDocument();
 });
+
+test('opens and closes the cumulative stats policy dialog', () => {
+  render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: 'ⓘ 통계 기준' }));
+  expect(screen.getByRole('dialog', { name: 'MAD FC 누적 스탯 반영 기준' })).toBeInTheDocument();
+  expect(screen.getByText('정상출석: 3점')).toBeInTheDocument();
+  fireEvent.keyDown(window, { key: 'Escape' });
+  expect(screen.queryByRole('dialog', { name: 'MAD FC 누적 스탯 반영 기준' })).not.toBeInTheDocument();
+});

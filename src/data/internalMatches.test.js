@@ -1,6 +1,6 @@
 import internalMatches from './internalMatches';
 import matchAnalyses from './playerReviews';
-import { buildSummary, seasonData } from '../App';
+import { buildSeasonStats, buildSummary, seasonData } from '../App';
 
 test('2026-10-31 internal match totals are derived correctly', () => {
   const match = internalMatches[0];
@@ -56,4 +56,27 @@ test('canonical names keep the existing player ids and records', () => {
   expect(seasonData.players.filter((player) => ['정연규', '전대영'].includes(player.name))).toHaveLength(2);
   expect(seasonData.matches.find((match) => match.id === '20261024')?.playerStats.p16).toMatchObject({ goals: 1, assists: 1 });
   expect(internalMatches[0].playerStats.p16).toMatchObject({ goals: 4, assists: 1 });
+});
+
+test('internal attendance affects only member match and attendance totals', () => {
+  const rows = buildSeasonStats(seasonData);
+  const rowsById = Object.fromEntries(rows.map((row) => [row.id, row]));
+  const expectedMembers = {
+    p1: { externalMatches: 3, matches: 4, externalAttendanceScore: 6, attendanceScore: 9 },
+    p3: { externalMatches: 3, matches: 4, externalAttendanceScore: 8, attendanceScore: 11 },
+    p4: { externalMatches: 3, matches: 4, externalAttendanceScore: 9, attendanceScore: 12 },
+    p6: { externalMatches: 2, matches: 3, externalAttendanceScore: 2, attendanceScore: 3 },
+    p7: { externalMatches: 2, matches: 3, externalAttendanceScore: 6, attendanceScore: 9 },
+    p9: { externalMatches: 0, matches: 1, externalAttendanceScore: 0, attendanceScore: 3 },
+    p10: { externalMatches: 0, matches: 1, externalAttendanceScore: 0, attendanceScore: 3 },
+    p11: { externalMatches: 2, matches: 3, externalAttendanceScore: 4, attendanceScore: 5 },
+  };
+
+  Object.entries(expectedMembers).forEach(([playerId, expected]) => {
+    expect(rowsById[playerId]).toMatchObject({ ...expected, internalMatches: 1 });
+  });
+
+  expect(rowsById.p16).toMatchObject({ internalMatches: 0, goals: 1, assists: 1 });
+  expect(rowsById.p12.internalMatches).toBe(0);
+  expect(rowsById.p4).toMatchObject({ goals: 6, assists: 3, points: 9, averageGoals: 2, averageAssists: 1, averagePoints: 3 });
 });

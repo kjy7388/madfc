@@ -1062,6 +1062,33 @@ tbody tr:hover {
   color: var(--red);
 }
 
+.match-header strong.internal-result {
+  width: auto;
+  min-width: 78px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.internal-match-header > div {
+  min-width: 0;
+}
+
+.internal-match-header .internal-match-score {
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.internal-match-header .internal-match-venue {
+  margin-top: 5px;
+  font-size: 0.82rem;
+}
+
 .quarter-strip {
   display: grid;
   grid-template-columns: repeat(8, minmax(0, 1fr));
@@ -1124,6 +1151,73 @@ tbody tr:hover {
   display: grid;
   gap: 4px;
   margin-top: 8px;
+}
+
+.internal-quarter-card {
+  min-height: 240px;
+}
+
+.internal-quarter-teams {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.internal-quarter-team {
+  display: grid;
+  gap: 3px;
+  padding: 7px;
+  border-left: 2px solid var(--blue);
+  border-radius: 6px;
+  background: rgba(66, 135, 245, 0.08);
+}
+
+.internal-quarter-team.team-b {
+  border-left-color: var(--red);
+  background: rgba(255, 91, 105, 0.07);
+}
+
+.internal-quarter-team b {
+  color: var(--blue);
+  font-size: 0.72rem;
+}
+
+.internal-quarter-team.team-b b {
+  color: var(--red);
+}
+
+.internal-quarter-team span {
+  color: #dce5f3;
+  font-size: 0.67rem;
+  line-height: 1.35;
+}
+
+.internal-match-stats-table th:first-child,
+.internal-match-stats-table td:first-child {
+  width: 24%;
+}
+
+.internal-match-stats-table th:not(:first-child),
+.internal-match-stats-table td:not(:first-child) {
+  width: auto;
+  text-align: center;
+}
+
+.internal-team-badge {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 38px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(66, 135, 245, 0.14);
+  color: var(--blue);
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.internal-team-badge.team-b {
+  background: rgba(255, 91, 105, 0.13);
+  color: var(--red);
 }
 
 .event-row {
@@ -1886,6 +1980,29 @@ tbody tr:hover {
     font-size: 1.18rem;
   }
 
+  .match-header.internal-match-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .internal-match-header h2 {
+    overflow-wrap: normal;
+    word-break: keep-all;
+  }
+
+  .internal-match-header .internal-match-score {
+    font-size: 0.9rem;
+  }
+
+  .internal-match-header strong.internal-result {
+    width: auto;
+    min-width: 70px;
+    height: 40px;
+    padding: 0 11px;
+    font-size: 0.86rem;
+  }
+
   .quarter-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
@@ -2095,6 +2212,69 @@ tbody tr:hover {
     white-space: pre;
     font-size: 0.68rem;
     line-height: 1.15;
+  }
+
+  .internal-match-stats-table tr {
+    grid-template-columns: minmax(78px, 1.4fr) 38px 30px 34px 40px 46px 44px;
+    justify-content: stretch;
+  }
+
+  .internal-match-stats-table th:nth-child(2),
+  .internal-match-stats-table td:nth-child(2) {
+    display: flex;
+  }
+
+  .internal-match-stats-table th:nth-child(n) {
+    font-size: 0.66rem;
+  }
+
+  .internal-match-stats-table th:nth-child(n)::after {
+    content: none;
+  }
+
+  .internal-match-stats-table th:nth-child(5),
+  .internal-match-stats-table th:nth-child(6),
+  .internal-match-stats-table th:nth-child(7) {
+    white-space: normal;
+    line-height: 1.1;
+  }
+
+  .internal-match-stats-table th:nth-child(5) {
+    font-size: 0;
+  }
+
+  .internal-match-stats-table th:nth-child(5)::after {
+    content: "공격P";
+    display: inline;
+    font-size: 0.66rem;
+  }
+
+  .internal-match-stats-table th:nth-child(6) {
+    font-size: 0;
+  }
+
+  .internal-match-stats-table th:nth-child(6)::after {
+    content: "출전\a쿼터";
+    display: inline;
+    white-space: pre;
+    font-size: 0.64rem;
+  }
+
+  .internal-match-stats-table th:nth-child(7) {
+    font-size: 0;
+  }
+
+  .internal-match-stats-table th:nth-child(7)::after {
+    content: "득실\a마진";
+    display: inline;
+    white-space: pre;
+    font-size: 0.64rem;
+  }
+
+  .internal-match-stats-table .internal-team-badge {
+    min-width: 30px;
+    padding: 3px 4px;
+    font-size: 0.66rem;
   }
 
   .appearance-cell {

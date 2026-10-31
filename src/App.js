@@ -3,10 +3,11 @@ import { toPng } from 'html-to-image';
 import madfcLogo from './assets/images/madfc-logo.png';
 import madfcWordmark from './assets/images/madfc-wordmark.png';
 import matchAnalyses from './data/playerReviews';
+import internalMatches from './data/internalMatches';
 import InternalMatch from './InternalMatch';
 import './index.css';
 
-const seasonData = {
+export const seasonData = {
   club: 'Mad FC',
   season: '2026 시즌',
   players: [
@@ -111,6 +112,7 @@ const seasonData = {
         p16: { attendanceScore: 0, goals: 1, assists: 1, appearances: [false, true, true, false, true, true, false] },
       },
     },
+    ...internalMatches,
   ],
 };
 
@@ -126,7 +128,8 @@ function App() {
   const [isDownloading, setIsDownloading] = useState(false);
   const data = seasonData;
   const [selectedMatchId, setSelectedMatchId] = useState(data.matches.at(-1)?.id ?? '');
-  const [selectedRecentMatchId, setSelectedRecentMatchId] = useState(data.matches.at(-1)?.id ?? '');
+  const officialMatches = data.matches.filter((match) => !isInternalMatch(match));
+  const [selectedRecentMatchId, setSelectedRecentMatchId] = useState(officialMatches.at(-1)?.id ?? '');
   const [includeGuests, setIncludeGuests] = useState(false);
   const [rankingMetric, setRankingMetric] = useState('goals');
   const [activeMatchTab, setActiveMatchTab] = useState('summary');
@@ -137,13 +140,22 @@ function App() {
   const visibleSeasonRows = includeGuests ? seasonRows : seasonRows.filter((row) => !row.guest);
   const summary = buildSummary(data);
   const winRate = summary.matches ? Math.round((summary.wins / summary.matches) * 100) : 0;
-  const recentResults = data.matches.slice(-8).map(getResult);
-  const matchesNewestFirst = [...data.matches].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+  const recentResults = officialMatches.slice(-8).map(getResult);
+  const matchesNewestFirst = [...officialMatches].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+  const allMatchesNewestFirst = [...data.matches].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
   const mobileRecentMatches = matchesNewestFirst.slice(0, 3).reverse();
   const selectedRecentMatch = mobileRecentMatches.find((match) => match.id === selectedRecentMatchId) ?? mobileRecentMatches.at(-1);
   const rankingRows = buildRankingRows(visibleSeasonRows, rankingMetric).slice(0, 5);
   const topRankingValue = Math.max(...rankingRows.map((row) => row.rankValue), 1);
-  const selectedMatchPlayers = data.players.filter((player) => selectedMatch.playerStats[player.id]?.appearances?.some(Boolean));
+  const selectedMatchPlayers = data.players
+    .filter((player) => {
+      const stat = selectedMatch.playerStats[player.id];
+      return isInternalMatch(selectedMatch) ? Boolean(stat) : stat?.appearances?.some(Boolean);
+    })
+    .sort((a, b) => {
+      if (!isInternalMatch(selectedMatch)) return 0;
+      return selectedMatch.playerOrder.indexOf(a.id) - selectedMatch.playerOrder.indexOf(b.id);
+    });
   const selectedMatchAnalysis = buildMatchAnalysis(selectedMatch, selectedMatchPlayers, matchAnalyses);
 
   function openMatchDetail(matchId) {
@@ -370,9 +382,9 @@ function App() {
                   setActiveMatchTab('summary');
                 }}
               >
-                {data.matches.map((match) => (
+                {allMatchesNewestFirst.map((match) => (
                   <option value={match.id} key={match.id}>
-                    {formatDate(match.date)} · {match.venue} · {match.opponent}
+                    {isInternalMatch(match) ? '[자체전]' : '[매치]'} {formatDate(match.date)} · {match.venue}{isInternalMatch(match) ? '' : ` · ${match.opponent}`}
                   </option>
                 ))}
               </select>
@@ -393,40 +405,60 @@ function App() {
             </button>
           </div>
 
-          <div className={`match-header match-tab-panel ${activeMatchTab === 'summary' ? 'active' : ''}`}>
+          <div className={`match-header match-tab-panel ${isInternalMatch(selectedMatch) ? 'internal-match-header' : ''} ${activeMatchTab === 'summary' ? 'active' : ''}`}>
             <div>
               <span>{formatDate(selectedMatch.date)}</span>
-              <h2>{data.club} vs {selectedMatch.opponent}</h2>
-              <p>{selectedMatch.venue} | 최종 스코어 {selectedMatch.teamScore} : {selectedMatch.opponentScore}</p>
+              <h2>{isInternalMatch(selectedMatch) ? selectedMatch.title : `${data.club} vs ${selectedMatch.opponent}`}</h2>
+              {isInternalMatch(selectedMatch) ? (
+                <>
+                  <p className="internal-match-score">A팀 {selectedMatch.teamScore} : {selectedMatch.opponentScore} B팀</p>
+                  <p className="internal-match-venue">{selectedMatch.venue}</p>
+                </>
+              ) : (
+                <p>{selectedMatch.venue} | 최종 스코어 {selectedMatch.teamScore} : {selectedMatch.opponentScore}</p>
+              )}
             </div>
-            <strong className={resultClass(getResult(selectedMatch))}>{getResult(selectedMatch)}</strong>
+            <strong className={`${resultClass(getResult(selectedMatch))} ${isInternalMatch(selectedMatch) ? 'internal-result' : ''}`}>{getResult(selectedMatch)}</strong>
           </div>
 
           <div className={`quarter-strip match-tab-panel ${activeMatchTab === 'quarters' ? 'active' : ''}`} aria-label="쿼터별 결과">
             {selectedMatch.quarters.map((quarter) => (
-              <QuarterCard quarter={quarter} key={quarter.label} />
+              <QuarterCard quarter={quarter} players={data.players} internal={isInternalMatch(selectedMatch)} key={quarter.label} />
             ))}
           </div>
 
           <div className={`table-panel match-stats-panel match-tab-panel ${activeMatchTab === 'players' ? 'active' : ''}`}>
-            <table className="match-stats-table">
+            <table className={`match-stats-table ${isInternalMatch(selectedMatch) ? 'internal-match-stats-table' : ''}`}>
               <thead>
-                <tr>
-                  <th>선수</th>
-                  <th>포지션</th>
-                  <th>출석점수</th>
-                  <th>득점</th>
-                  <th>어시스트</th>
-                  <th>공격포인트</th>
-                  <th>출전쿼터</th>
-                  <th>득실마진</th>
-                </tr>
+                {isInternalMatch(selectedMatch) ? (
+                  <tr>
+                    <th>선수</th><th>팀</th><th>득점</th><th>어시스트</th><th>공격포인트</th><th>출전쿼터</th><th>득실마진</th>
+                  </tr>
+                ) : (
+                  <tr>
+                    <th>선수</th><th>포지션</th><th>출석점수</th><th>득점</th><th>어시스트</th><th>공격포인트</th><th>출전쿼터</th><th>득실마진</th>
+                  </tr>
+                )}
               </thead>
               <tbody>
                 {selectedMatchPlayers.map((player) => {
                   const stat = selectedMatch.playerStats[player.id] ?? {};
                   const points = (stat.goals ?? 0) + (stat.assists ?? 0);
                   const plusMinus = getPlusMinusFromAppearances(selectedMatch, stat.appearances);
+
+                  if (isInternalMatch(selectedMatch)) {
+                    return (
+                      <tr key={player.id}>
+                        <td className="player"><PlayerName player={player} onClick={() => setSelectedPlayerId(player.id)} /></td>
+                        <td><span className={`internal-team-badge team-${stat.team.toLowerCase()}`}>{stat.team}팀</span></td>
+                        <td>{stat.goals}</td>
+                        <td>{stat.assists}</td>
+                        <td className="highlight">{points}</td>
+                        <td>—</td>
+                        <td>—</td>
+                      </tr>
+                    );
+                  }
 
                   return (
                     <tr key={player.id}>
@@ -502,8 +534,28 @@ function StatBlock({ label, value }) {
   );
 }
 
-function QuarterCard({ quarter }) {
+function QuarterCard({ quarter, players, internal = false }) {
   const margin = quarter.for - quarter.against;
+
+  if (internal) {
+    const playersById = Object.fromEntries(players.map((player) => [player.id, player]));
+    return (
+      <article className="quarter-card internal-quarter-card">
+        <div className="quarter-title"><span>{quarter.label}</span><em>A : B</em></div>
+        <strong>{quarter.for} : {quarter.against}</strong>
+        <div className="internal-quarter-teams">
+          {['A', 'B'].map((team) => (
+            <div className={`internal-quarter-team team-${team.toLowerCase()}`} key={team}>
+              <b>{team}팀</b>
+              {Object.entries(quarter.teamStats[team]).length ? Object.entries(quarter.teamStats[team]).map(([playerId, [goals, assists]]) => (
+                <span key={playerId}>{playersById[playerId]?.name ?? playerId} {goals}골 · {assists}도움</span>
+              )) : <span>기록 없음</span>}
+            </div>
+          ))}
+        </div>
+      </article>
+    );
+  }
 
   return (
     <article className="quarter-card">
@@ -764,6 +816,9 @@ function buildMatchAnalysis(match, matchPlayers, analysesByMatch) {
 
 function buildMatchStatLine(match, playerId) {
   const stat = match.playerStats[playerId] ?? {};
+  if (isInternalMatch(match) && !Array.isArray(stat.appearances)) {
+    return `${stat.goals ?? 0}골 · ${stat.assists ?? 0}어시 · 출전쿼터 — · 득실마진 —`;
+  }
   const appearances = stat.appearances ?? [];
   const quarters = appearances.filter(Boolean).length;
   const plusMinus = getPlusMinusFromAppearances(match, appearances);
@@ -771,8 +826,8 @@ function buildMatchStatLine(match, playerId) {
   return `${stat.goals ?? 0}골 · ${stat.assists ?? 0}어시 · ${quarters}쿼터 · 득실마진 ${formatSigned(plusMinus)}`;
 }
 
-function buildSummary(data) {
-  return data.matches.reduce(
+export function buildSummary(data) {
+  return data.matches.filter((match) => !isInternalMatch(match)).reduce(
     (acc, match) => {
       const result = getResult(match);
 
@@ -801,7 +856,7 @@ function buildSeasonStats(data) {
   }));
   const rowsById = Object.fromEntries(rows.map((row) => [row.id, row]));
 
-  data.matches.forEach((match) => {
+  data.matches.filter((match) => !isInternalMatch(match)).forEach((match) => {
     Object.entries(match.playerStats).forEach(([playerId, stat]) => {
       const row = rowsById[playerId];
       if (!row) return;
@@ -825,6 +880,7 @@ function buildPlayerDetail(data, seasonRows, playerId) {
   if (!player || !season) return null;
 
   const matches = data.matches
+    .filter((match) => !isInternalMatch(match))
     .map((match) => {
       const stat = match.playerStats[playerId];
       const appearances = stat?.appearances ?? [];
@@ -889,15 +945,24 @@ function getPlusMinusFromAppearances(match, appearances = []) {
 }
 
 function getResult(match) {
+  if (isInternalMatch(match)) {
+    if (match.teamScore > match.opponentScore) return 'A팀 승';
+    if (match.teamScore < match.opponentScore) return 'B팀 승';
+    return '무승부';
+  }
   if (match.teamScore > match.opponentScore) return '승';
   if (match.teamScore < match.opponentScore) return '패';
   return '무';
 }
 
 function resultClass(result) {
-  if (result === '승') return 'win';
-  if (result === '패') return 'loss';
+  if (result === '승' || result === 'A팀 승') return 'win';
+  if (result === '패' || result === 'B팀 승') return 'loss';
   return 'draw';
+}
+
+function isInternalMatch(match) {
+  return match?.matchType === 'internal';
 }
 
 function formatDate(dateString) {

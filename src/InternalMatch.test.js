@@ -34,6 +34,29 @@ test('never calculates a negative score', () => {
   expect(getMatchTotals(match.quarters)).toEqual({ A: 0, B: 0 });
 });
 
+test('separates member and guest assignments and uses simplified guest attendance', () => {
+  const match = createInitialInternalMatch();
+  match.matchAttendance = { g1: 'changed' };
+  window.localStorage.setItem('madfc-internal-match-v1', JSON.stringify(match));
+  const mixedPlayers = [
+    { id: 'p2', name: '박경민' },
+    { id: 'g2', name: '황훈식', guest: true },
+    { id: 'p1', name: '고유순' },
+    { id: 'g1', name: '류경상', guest: true },
+  ];
+
+  render(<InternalMatch players={mixedPlayers} />);
+
+  const memberGroup = screen.getByRole('heading', { name: '정규 멤버' }).closest('.assignment-group');
+  const guestGroup = screen.getByRole('heading', { name: '용병' }).closest('.assignment-group');
+  expect([...memberGroup.querySelectorAll('.assignment-row > span')].map((node) => node.firstChild.textContent)).toEqual(['고유순', '박경민']);
+  expect([...guestGroup.querySelectorAll('.assignment-row > span')].map((node) => node.firstChild.textContent)).toEqual(['류경상', '황훈식']);
+
+  const guestSelect = screen.getByLabelText('류경상 출석 상태');
+  expect(guestSelect).toHaveValue('present');
+  expect([...guestSelect.options].map((option) => option.text)).toEqual(['미선택', '출석']);
+});
+
 test('restores an in-progress match from localStorage', async () => {
   const firstRender = render(<InternalMatch players={players} />);
   fireEvent.click(within(screen.getByText('김장엽').closest('.assignment-row')).getByText('A팀'));

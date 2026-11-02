@@ -3,6 +3,12 @@ import './internal-match.css';
 
 const STORAGE_KEY = 'madfc-internal-match-v1';
 const QUARTER_COUNT = 8;
+const MATCH_ATTENDANCE_OPTIONS = [
+  { value: 'present', label: '정상출석', score: 3 },
+  { value: 'changed', label: '불참 후 참석변경', score: 2 },
+  { value: 'late', label: '지각', score: 1 },
+  { value: 'absent', label: '불참', score: 0 },
+];
 
 function localDate() {
   const now = new Date();
@@ -29,6 +35,7 @@ export function createInitialInternalMatch() {
     phase: 'setup',
     currentQuarter: 0,
     assignments: {},
+    matchAttendance: {},
     temporaryPlayers: [],
     quarters: Array.from({ length: QUARTER_COUNT }, (_, index) => emptyQuarter(index)),
   };
@@ -40,6 +47,7 @@ function loadSavedMatch() {
     if (saved?.version === 1 && Array.isArray(saved.quarters) && saved.quarters.length === QUARTER_COUNT) {
       return {
         ...saved,
+        matchAttendance: saved.matchAttendance || {},
         quarters: saved.quarters.map((quarter) => ({
           ...quarter,
           scoreIncluded: quarter.scoreIncluded !== false,
@@ -52,16 +60,18 @@ function loadSavedMatch() {
   return createInitialInternalMatch();
 }
 
-function snapshotRosters(assignments) {
+function snapshotRosters(assignments, matchAttendance = {}) {
   return Object.entries(assignments).reduce((rosters, [playerId, team]) => {
-    if (team === 'A' || team === 'B') rosters[team].push(playerId);
+    const hasAttendance = Object.prototype.hasOwnProperty.call(matchAttendance, playerId);
+    const attends = !hasAttendance || ['present', 'changed', 'late'].includes(matchAttendance[playerId]);
+    if ((team === 'A' || team === 'B') && attends) rosters[team].push(playerId);
     return rosters;
   }, { A: [], B: [] });
 }
 
-function initializeQuarter(quarter, assignments, previousQuarter = null) {
+function initializeQuarter(quarter, assignments, matchAttendance = {}, previousQuarter = null) {
   if (quarter.initialized) return quarter;
-  const rosters = snapshotRosters(assignments);
+  const rosters = snapshotRosters(assignments, matchAttendance);
   const attendance = Object.fromEntries(
     [...rosters.A, ...rosters.B].map((playerId) => [playerId, previousQuarter?.attendance?.[playerId] === true]),
   );
@@ -147,6 +157,23 @@ function formatSigned(value) {
   return value > 0 ? `+${value}` : `${value}`;
 }
 
+function getMatchAttendance(match, playerId) {
+  const value = match.matchAttendance?.[playerId] || (match.assignments?.[playerId] ? 'present' : '');
+  return MATCH_ATTENDANCE_OPTIONS.find((option) => option.value === value) || null;
+}
+
+function isGuestPlayer(player) {
+  return player?.guest === true || player?.temporary === true;
+}
+
+function guestAttendanceValue(status) {
+  return status === 'present' || status === 'changed' || status === 'late' ? 'present' : '';
+}
+
+function sortPlayersByName(players) {
+  return [...players].sort((a, b) => a.name.localeCompare(b.name, 'ko-KR'));
+}
+
 export function formatExportText(match, playerMap) {
   const totals = getMatchTotals(match.quarters);
   const actualTotals = getActualTotals(match.quarters);
@@ -157,6 +184,18 @@ export function formatExportText(match, playerMap) {
     '',
     `경기일: ${match.date}`,
     '경기 유형: 자체전',
+    '',
+    '[출석 상태]',
+    ...Object.keys(match.assignments || {})
+      .filter((playerId) => match.assignments[playerId] === 'A' || match.assignments[playerId] === 'B')
+      .map((playerId) => {
+        const player = playerMap[playerId];
+        const attendance = getMatchAttendance(match, playerId);
+        const guest = isGuestPlayer(player);
+        const label = guest ? (guestAttendanceValue(match.matchAttendance?.[playerId]) ? '출석' : '미선택') : attendance?.label || '미선택';
+        const score = guest ? '집계 제외' : `${attendance?.score ?? 0}점`;
+        return `${player?.name || '알 수 없는 선수'}: ${label} / ${score}`;
+      }),
     '',
     '[최종 승부 스코어]',
     `A팀 ${totals.A} : ${totals.B} B팀`,
@@ -226,7 +265,7 @@ export function formatExportText(match, playerMap) {
   return lines.join('\n');
 }
 
-export default function InternalMatch({ players }) {
+export default function InternalMatch({ players, modeSwitcher = null }) {
   const [match, setMatch] = useState(loadSavedMatch);
   const [temporaryName, setTemporaryName] = useState('');
   const [copyStatus, setCopyStatus] = useState('');
@@ -248,6 +287,17 @@ export default function InternalMatch({ players }) {
     setMatch((current) => ({
       ...current,
       assignments: { ...current.assignments, [playerId]: team },
+      matchAttendance: {
+        ...(current.matchAttendance || {}),
+        ...(team && !current.matchAttendance?.[playerId] ? { [playerId]: 'present' } : {}),
+      },
+    }));
+  }
+
+  function updateMatchAttendance(playerId, status) {
+    setMatch((current) => ({
+      ...current,
+      matchAttendance: { ...(current.matchAttendance || {}), [playerId]: status },
     }));
   }
 
@@ -260,20 +310,22 @@ export default function InternalMatch({ players }) {
       ...current,
       temporaryPlayers: [...current.temporaryPlayers, player],
       assignments: { ...current.assignments, [player.id]: 'A' },
+      matchAttendance: { ...(current.matchAttendance || {}), [player.id]: 'present' },
     }));
     setTemporaryName('');
   }
 
   function startMatch() {
-    const hasA = Object.values(match.assignments).includes('A');
-    const hasB = Object.values(match.assignments).includes('B');
+    const rosters = snapshotRosters(match.assignments, match.matchAttendance);
+    const hasA = rosters.A.length > 0;
+    const hasB = rosters.B.length > 0;
     if (!hasA || !hasB) {
       window.alert('A팀과 B팀에 각각 한 명 이상 배정해 주세요.');
       return;
     }
     setMatch((current) => {
       const quarters = [...current.quarters];
-      quarters[0] = initializeQuarter(quarters[0], current.assignments);
+      quarters[0] = initializeQuarter(quarters[0], current.assignments, current.matchAttendance);
       return { ...current, phase: 'running', currentQuarter: 0, quarters };
     });
   }
@@ -281,7 +333,7 @@ export default function InternalMatch({ players }) {
   function selectQuarter(index) {
     setMatch((current) => {
       const quarters = [...current.quarters];
-      quarters[index] = initializeQuarter(quarters[index], current.assignments, index > 0 ? quarters[index - 1] : null);
+      quarters[index] = initializeQuarter(quarters[index], current.assignments, current.matchAttendance, index > 0 ? quarters[index - 1] : null);
       return { ...current, currentQuarter: index, quarters };
     });
   }
@@ -367,6 +419,7 @@ export default function InternalMatch({ players }) {
       <header className="internal-scoreboard">
         <div className="internal-topline">
           <a href="/" className="internal-back">← 공식 기록</a>
+          {modeSwitcher}
           <span>INTERNAL MATCH</span>
         </div>
         <h1>MAD FC 자체전</h1>
@@ -386,18 +439,7 @@ export default function InternalMatch({ players }) {
             <div className="internal-section-head"><span>01</span><div><b>MATCH SETUP</b><h2>경기 및 팀 설정</h2></div></div>
             <label className="internal-date">경기 날짜<input type="date" value={match.date} onChange={(event) => setMatch((current) => ({ ...current, date: event.target.value }))} /></label>
             <p className="internal-help">선수를 A팀 또는 B팀에 배정하세요. 배정하지 않은 선수는 이번 자체전에 포함되지 않습니다.</p>
-            <div className="assignment-list">
-              {allPlayers.map((player) => (
-                <div className="assignment-row" key={player.id}>
-                  <span>{player.name}{player.temporary ? <small>임시</small> : null}</span>
-                  <div className="team-choice" role="group" aria-label={`${player.name} 팀 배정`}>
-                    {['A', 'B', ''].map((team) => (
-                      <button type="button" className={match.assignments[player.id] === team ? 'active' : ''} onClick={() => updateAssignment(player.id, team)} key={team || 'none'}>{team ? `${team}팀` : '제외'}</button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <AssignmentGroups players={allPlayers} assignments={match.assignments} attendance={match.matchAttendance} onAssignmentChange={updateAssignment} onAttendanceChange={updateMatchAttendance} />
             <form className="temporary-player-form" onSubmit={addTemporaryPlayer}>
               <input value={temporaryName} onChange={(event) => setTemporaryName(event.target.value)} placeholder="임시 선수 이름" aria-label="임시 선수 이름" />
               <button type="submit">선수 추가</button>
@@ -432,16 +474,7 @@ export default function InternalMatch({ players }) {
             <details>
               <summary>다음 미기록 쿼터의 팀 구성 변경</summary>
               <p className="internal-help">변경 내용은 아직 열지 않은 다음 쿼터부터 반영되며, 이전 쿼터 명단과 기록은 유지됩니다.</p>
-              <div className="assignment-list compact">
-                {allPlayers.map((player) => (
-                  <div className="assignment-row" key={player.id}>
-                    <span>{player.name}</span>
-                    <div className="team-choice">
-                      {['A', 'B', ''].map((team) => <button type="button" className={match.assignments[player.id] === team ? 'active' : ''} onClick={() => updateAssignment(player.id, team)} key={team || 'none'}>{team ? `${team}팀` : '제외'}</button>)}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <AssignmentGroups players={allPlayers} assignments={match.assignments} attendance={match.matchAttendance} onAssignmentChange={updateAssignment} onAttendanceChange={updateMatchAttendance} compact />
               <form className="temporary-player-form" onSubmit={addTemporaryPlayer}>
                 <input value={temporaryName} onChange={(event) => setTemporaryName(event.target.value)} placeholder="임시 선수 이름" />
                 <button type="submit">선수 추가</button>
@@ -457,6 +490,52 @@ export default function InternalMatch({ players }) {
         </main>
       )}
       {isScoreSettingsOpen ? <ScoreSettings quarters={match.quarters} onToggle={toggleQuarterScore} onClose={() => setIsScoreSettingsOpen(false)} /> : null}
+    </div>
+  );
+}
+
+function AttendanceSelect({ player, value, assigned, onChange }) {
+  const guest = isGuestPlayer(player);
+  const storedStatus = value || (assigned ? 'present' : '');
+  const status = guest ? guestAttendanceValue(storedStatus) : storedStatus;
+  const option = MATCH_ATTENDANCE_OPTIONS.find((item) => item.value === status);
+  const options = guest
+    ? [{ value: '', label: '미선택' }, { value: 'present', label: '출석' }]
+    : [{ value: '', label: '미선택' }, ...MATCH_ATTENDANCE_OPTIONS];
+  return (
+    <label className="match-attendance-select">
+      <span className="sr-only">{player.name} 출석 상태</span>
+      <select value={status} onChange={(event) => onChange(player.id, event.target.value)} aria-label={`${player.name} 출석 상태`}>
+        {options.map((item) => <option value={item.value} key={item.value}>{item.label}</option>)}
+      </select>
+      <em>{guest ? '집계 제외' : option ? `${option.score}점` : '0점'}</em>
+    </label>
+  );
+}
+
+function AssignmentGroups({ players, assignments, attendance, onAssignmentChange, onAttendanceChange, compact = false }) {
+  const groups = [
+    { title: '정규 멤버', players: sortPlayersByName(players.filter((player) => !isGuestPlayer(player))), guest: false },
+    { title: '용병', players: sortPlayersByName(players.filter(isGuestPlayer)), guest: true },
+  ];
+  return (
+    <div className={`assignment-groups ${compact ? 'compact' : ''}`}>
+      {groups.map((group) => (
+        <section className={`assignment-group ${group.guest ? 'guest' : 'member'}`} key={group.title}>
+          <h3>{group.title}</h3>
+          <div className="assignment-list">
+            {group.players.length ? group.players.map((player) => (
+              <div className="assignment-row" key={player.id}>
+                <span>{player.name}{group.guest ? <small>용병</small> : null}</span>
+                <div className="team-choice" role="group" aria-label={`${player.name} 팀 배정`}>
+                  {['A', 'B', ''].map((team) => <button type="button" className={assignments[player.id] === team ? 'active' : ''} onClick={() => onAssignmentChange(player.id, team)} key={team || 'none'}>{team ? `${team}팀` : '제외'}</button>)}
+                </div>
+                <AttendanceSelect player={player} value={attendance?.[player.id]} assigned={Boolean(assignments[player.id])} onChange={onAttendanceChange} />
+              </div>
+            )) : <p className="assignment-group-empty">등록된 선수가 없습니다.</p>}
+          </div>
+        </section>
+      ))}
     </div>
   );
 }

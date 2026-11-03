@@ -63,7 +63,9 @@
 .match-attendance-select em { color: var(--muted); font-size: 0.68rem; font-style: normal; font-weight: 800; text-align: right; }
 .team-choice { display: grid; grid-template-columns: repeat(3, 48px); gap: 4px; flex: 0 0 auto; }
 .team-choice button { min-height: 34px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; font-size: 0.72rem; font-weight: 900; }
-.team-choice button.active { border-color: var(--blue); background: var(--blue-soft); color: #dce9ff; }
+.team-choice button:nth-child(1).active { border-color: var(--blue); background: var(--blue-soft); color: #dce9ff; }
+.team-choice button:nth-child(2).active { border-color: var(--red); background: rgba(255, 91, 105, 0.18); color: #ffd7da; }
+.team-choice button:nth-child(3).active { border-color: #64748b; background: rgba(100, 116, 139, 0.24); color: #e2e8f0; }
 .temporary-player-form { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin: 14px 0; }
 .temporary-player-form button, .internal-secondary { min-height: 44px; padding: 0 16px; border: 1px solid var(--line); border-radius: 11px; background: #202a3d; color: var(--text); cursor: pointer; font-weight: 900; }
 .internal-primary { min-height: 48px; padding: 0 20px; border: 0; border-radius: 12px; background: var(--blue); color: #fff; cursor: pointer; font-weight: 950; }

@@ -46,7 +46,9 @@
 .internal-section-head b { color: var(--muted); font-size: 0.7rem; letter-spacing: 0.12em; }
 .internal-section-head h2 { margin: 2px 0 0; font-size: 1.25rem; }
 .internal-date { display: grid; gap: 7px; color: var(--muted); font-size: 0.82rem; font-weight: 850; }
-.internal-date input, .temporary-player-form input { min-width: 0; min-height: 46px; padding: 0 13px; border: 1px solid var(--line); border-radius: 11px; background: #101827; color: var(--text); font: inherit; }
+.internal-date input, .temporary-player-form input { display: block; width: 100%; min-width: 0; max-width: 100%; height: 46px; min-height: 46px; padding: 0 13px; border: 1px solid var(--line); border-radius: 11px; background: #101827; color: var(--text); font: inherit; }
+.internal-date input[type="date"] { -webkit-appearance: none; appearance: none; line-height: 46px; }
+.internal-date input[type="date"]::-webkit-date-and-time-value { display: flex; align-items: center; min-width: 0; height: 100%; text-align: left; }
 .internal-help { color: var(--muted); font-size: 0.82rem; line-height: 1.55; }
 
 .assignment-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
@@ -56,13 +58,13 @@
 .assignment-list { display: grid; gap: 8px; }
 .assignment-group-empty { margin: 8px 0; color: var(--muted); font-size: 0.75rem; }
 .assignment-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; padding: 9px 10px; border: 1px solid rgba(43, 54, 80, 0.72); border-radius: 11px; background: #111827; }
-.assignment-row > span { min-width: 0; font-weight: 850; }
+.assignment-row > span { flex: 1 1 90px; min-width: 0; overflow: hidden; font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
 .assignment-row small { margin-left: 6px; color: var(--blue); font-size: 0.65rem; }
 .match-attendance-select { display: grid; grid-template-columns: minmax(96px, 1fr) 46px; align-items: center; gap: 6px; min-width: 154px; }
-.match-attendance-select select { min-width: 0; height: 34px; border: 1px solid var(--line); border-radius: 8px; background: #0d1525; color: var(--text); padding: 0 7px; font: inherit; font-size: 0.72rem; font-weight: 800; }
+.match-attendance-select select { -webkit-appearance: none; appearance: none; display: block; width: 100%; min-width: 0; max-width: 100%; height: 38px; min-height: 38px; border: 1px solid var(--line); border-radius: 8px; background-color: #0d1525; background-image: linear-gradient(45deg, transparent 50%, #9db9e9 50%), linear-gradient(135deg, #9db9e9 50%, transparent 50%); background-position: calc(100% - 13px) 50%, calc(100% - 9px) 50%; background-repeat: no-repeat; background-size: 4px 4px, 4px 4px; color: var(--text); padding: 0 28px 0 8px; font: inherit; font-size: 0.72rem; font-weight: 800; line-height: normal; }
 .match-attendance-select em { color: var(--muted); font-size: 0.68rem; font-style: normal; font-weight: 800; text-align: right; }
 .team-choice { display: grid; grid-template-columns: repeat(3, 48px); gap: 4px; flex: 0 0 auto; }
-.team-choice button { min-height: 34px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; font-size: 0.72rem; font-weight: 900; }
+.team-choice button { height: 38px; min-height: 38px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; font-size: 0.72rem; font-weight: 900; }
 .team-choice button:nth-child(1).active { border-color: var(--blue); background: var(--blue-soft); color: #dce9ff; }
 .team-choice button:nth-child(2).active { border-color: var(--red); background: rgba(255, 91, 105, 0.18); color: #ffd7da; }
 .team-choice button:nth-child(3).active { border-color: #64748b; background: rgba(100, 116, 139, 0.24); color: #e2e8f0; }
@@ -313,16 +315,16 @@
 @media (max-width: 767px) {
   .internal-page { padding: 8px 10px 34px; }
   .internal-scoreboard { top: 6px; padding: 11px 13px; border-radius: 14px; }
-  .internal-scoreboard h1 { margin-top: 3px; font-size: 0.98rem; }
+  .internal-scoreboard h1 { margin-top: 14px; font-size: 0.98rem; }
   .internal-main-score { gap: 6px; margin-top: 3px; }
   .internal-main-score strong { font-size: 2.3rem; }
   .internal-main-score span { font-size: 0.66rem; }
   .internal-scoreboard > p { margin-top: 2px; }
   .setup-card, .result-summary, .live-roster-card { padding: 14px; }
   .assignment-groups { grid-template-columns: 1fr; }
-  .assignment-row { flex-wrap: wrap; padding: 8px; }
+  .assignment-row { flex-wrap: wrap; column-gap: 6px; row-gap: 8px; padding: 8px; }
   .assignment-row > span { flex: 1 1 100%; }
-  .match-attendance-select { flex: 1 1 150px; }
+  .match-attendance-select { flex: 1 1 150px; min-width: 0; }
   .team-choice { grid-template-columns: repeat(3, 45px); }
   .quarter-tabs { grid-template-columns: repeat(4, 1fr); }
   .quarter-tabs button { min-height: 47px; }

@@ -384,15 +384,27 @@
 
 @media (max-width: 767px) {
   .internal-topline {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
     gap: 6px;
+  }
+
+  .internal-topline > .internal-back {
+    justify-self: start;
   }
 
   .internal-topline > span {
     display: none;
   }
 
+  .scoreboard-controls {
+    display: contents;
+  }
+
   .scoreboard-mode-tabs {
+    grid-column: 2;
+    justify-self: center;
     grid-template-columns: repeat(2, minmax(60px, 1fr));
   }
 
@@ -402,9 +414,9 @@
     font-size: 0.68rem;
   }
 
-  .scoreboard-controls { gap: 4px; }
-
   .scoreboard-guide-button {
+    grid-column: 3;
+    justify-self: end;
     min-height: 34px;
     padding-inline: 8px;
     font-size: 0.66rem;

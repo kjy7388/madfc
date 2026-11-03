@@ -17,6 +17,7 @@
 .external-info-grid label,
 .external-event-modal > label {
   display: grid;
+  min-width: 0;
   gap: 6px;
   color: var(--muted);
   font-size: 0.75rem;
@@ -26,8 +27,11 @@
 .external-info-grid input,
 .external-event-modal select,
 .goalkeeper-select select {
+  display: block;
   width: 100%;
   min-width: 0;
+  max-width: 100%;
+  height: 44px;
   min-height: 44px;
   padding: 0 10px;
   border: 1px solid var(--line);
@@ -35,6 +39,20 @@
   background: #101827;
   color: var(--text);
   font: inherit;
+}
+
+.external-info-grid input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  line-height: 44px;
+}
+
+.external-info-grid input[type="date"]::-webkit-date-and-time-value {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  text-align: left;
 }
 
 .external-attendance {
@@ -123,12 +141,28 @@
 }
 
 .external-attendance-row select {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
   min-width: 0;
+  max-width: 100%;
+  height: 38px;
   min-height: 38px;
+  padding: 0 28px 0 9px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #182133;
+  background-color: #182133;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #9db9e9 50%),
+    linear-gradient(135deg, #9db9e9 50%, transparent 50%);
+  background-position:
+    calc(100% - 13px) 50%,
+    calc(100% - 9px) 50%;
+  background-repeat: no-repeat;
+  background-size: 4px 4px, 4px 4px;
   color: var(--text);
+  line-height: normal;
   font-size: 0.75rem;
 }
 

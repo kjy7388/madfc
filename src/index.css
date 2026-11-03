@@ -260,11 +260,12 @@ select {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 14px;
+  gap: 8px;
   flex: 0 0 auto;
 }
 
 .season-badge {
+  align-self: flex-end;
   border: 1px solid rgba(63, 134, 255, 0.32);
   border-radius: 999px;
   background: rgba(63, 134, 255, 0.1);
@@ -278,12 +279,23 @@ select {
 .download-button {
   border: 1px solid rgba(63, 134, 255, 0.55);
   border-radius: 12px;
-  background: var(--blue);
-  color: #fff;
+  background: rgba(12, 19, 34, 0.92);
+  color: #dbe8ff;
   cursor: pointer;
   font-weight: 900;
-  padding: 13px 18px;
+  width: 170px;
+  min-height: 44px;
+  padding: 10px 16px;
+  font-size: 1rem;
   white-space: nowrap;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.download-button:hover,
+.download-button:focus-visible {
+  border-color: rgba(105, 158, 255, 0.9);
+  background: rgba(29, 42, 65, 0.96);
+  color: #ffffff;
 }
 
 .download-button:disabled {
@@ -292,17 +304,30 @@ select {
 }
 
 .internal-match-link {
-  color: #cfe0ff;
-  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 170px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid #69a0ff;
+  border-radius: 12px;
+  background: var(--blue);
+  color: #ffffff;
+  font-size: 1rem;
   font-weight: 900;
   text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
 .internal-match-link:hover,
 .internal-match-link:focus-visible {
   color: #ffffff;
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  border-color: #8bb7ff;
+  background: #5592ff;
+  box-shadow: 0 8px 20px rgba(63, 134, 255, 0.22);
+  text-decoration: none;
 }
 
 .stats-filter-row {
@@ -1598,28 +1623,33 @@ tbody tr:hover {
   }
 
   .hero-actions {
+    display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 6px;
     width: 100%;
   }
 
   .season-badge {
+    align-self: auto;
     font-size: 0.68rem;
     letter-spacing: 0.09em;
     padding: 7px 10px;
   }
 
-  .download-button {
+  .download-button,
+  .internal-match-link {
     align-self: auto;
     width: auto;
-    min-height: 34px;
-    padding: 7px 11px;
+    min-height: 40px;
+    padding: 8px 10px;
     border-radius: 10px;
-    background: rgba(63, 134, 255, 0.18);
-    color: #dbe8ff;
-    font-size: 0.78rem;
+    font-size: 0.74rem;
+  }
+
+  .download-button {
+    background: rgba(12, 19, 34, 0.9);
   }
 
   .stats-filter-row {

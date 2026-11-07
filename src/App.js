@@ -157,25 +157,25 @@ function App() {
   const matchSectionRef = useRef(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const data = seasonData;
-  const [selectedMatchId, setSelectedMatchId] = useState(data.matches.at(-1)?.id ?? '');
   const officialMatches = data.matches.filter((match) => !isInternalMatch(match));
-  const [selectedRecentMatchId, setSelectedRecentMatchId] = useState(officialMatches.at(-1)?.id ?? '');
+  const matchesNewestFirst = [...officialMatches].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+  const allMatchesNewestFirst = [...data.matches].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+  const displayedRecentMatches = matchesNewestFirst.slice(0, 5);
+  const [selectedMatchId, setSelectedMatchId] = useState(allMatchesNewestFirst[0]?.id ?? '');
+  const [selectedRecentMatchId, setSelectedRecentMatchId] = useState(displayedRecentMatches[0]?.id ?? '');
   const [includeGuests, setIncludeGuests] = useState(false);
   const [rankingMetric, setRankingMetric] = useState('goals');
   const [activeMatchTab, setActiveMatchTab] = useState('summary');
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
   const [isStatsInfoOpen, setIsStatsInfoOpen] = useState(false);
-  const selectedMatch = data.matches.find((match) => match.id === selectedMatchId) ?? data.matches.at(-1);
+  const selectedMatch = data.matches.find((match) => match.id === selectedMatchId) ?? allMatchesNewestFirst[0];
   const seasonRows = buildSeasonStats(data);
   const selectedPlayerDetail = selectedPlayerId ? buildPlayerDetail(data, seasonRows, selectedPlayerId) : null;
   const visibleSeasonRows = includeGuests ? seasonRows : seasonRows.filter((row) => !row.guest);
   const summary = buildSummary(data);
   const winRate = summary.matches ? Math.round((summary.wins / summary.matches) * 100) : 0;
   const recentResults = officialMatches.slice(-8).map(getResult);
-  const matchesNewestFirst = [...officialMatches].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
-  const allMatchesNewestFirst = [...data.matches].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
-  const mobileRecentMatches = matchesNewestFirst.slice(0, 3).reverse();
-  const selectedRecentMatch = mobileRecentMatches.find((match) => match.id === selectedRecentMatchId) ?? mobileRecentMatches.at(-1);
+  const selectedRecentMatch = displayedRecentMatches.find((match) => match.id === selectedRecentMatchId) ?? displayedRecentMatches[0];
   const rankingRows = buildRankingRows(visibleSeasonRows, rankingMetric).slice(0, 5);
   const topRankingValue = Math.max(...rankingRows.map((row) => row.rankValue), 1);
   const selectedMatchPlayers = data.players
@@ -313,7 +313,7 @@ function App() {
           <article className="panel-card recent-form-card">
             <SectionTitle eyebrow="Recent Form" title="최근 전적" />
             <div className="recent-match-list">
-              {matchesNewestFirst.map((match) => {
+              {displayedRecentMatches.map((match) => {
                 const result = getResult(match);
 
                 return (
@@ -329,7 +329,7 @@ function App() {
             </div>
             <div className="mobile-recent-form">
               <div className="form-row">
-                {mobileRecentMatches.map((match) => {
+                {displayedRecentMatches.map((match) => {
                   const result = getResult(match);
 
                   return (

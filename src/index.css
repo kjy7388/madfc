@@ -1792,6 +1792,9 @@ tbody tr:hover {
   }
 
   .form-row {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 30px));
+    justify-content: start;
     gap: 6px;
     margin-bottom: 10px;
   }

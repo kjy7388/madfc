@@ -8,7 +8,7 @@ const GUIDES = {
       { title: 'A팀/B팀 구성', description: '참석 선수를 A팀과 B팀으로 나누고 양 팀 구성을 확인하세요.', visual: 'teams' },
       { title: '쿼터별 출전 선수', description: '현재 쿼터에 실제로 뛰는 선수를 체크하세요.', visual: 'internalLineup', tip: '출전 체크는 출전 쿼터 수와 득실마진 계산에 사용됩니다.' },
       { title: '골·어시스트 기록', description: '선수별 + 버튼으로 득점과 어시스트를 원터치 기록하세요.', visual: 'internalRecord', tip: '자체전은 득점 순서나 득점자·어시스트 연결 관계를 별도로 기록하지 않습니다.' },
-      { title: '쿼터 전환 및 점수 관리', description: '쿼터 종료 후 다음 Q로 이동하고 필요하면 스코어 반영 여부를 설정하세요.', visual: 'internalQuarters', tip: '점수 반영에서 제외한 쿼터는 최종 승부 스코어에서만 제외되며, 해당 쿼터의 개인 기록은 유지됩니다.' },
+      { title: '쿼터 전환 및 점수 관리·타이머', description: '타이머를 시작하거나 멈추고, 쿼터 종료 후 다음 Q로 이동해 스코어 반영 여부를 설정하세요.', visual: 'internalQuarters', tip: '다음 쿼터는 기본 시간으로 대기하며 자동 시작되지 않습니다. 이전 쿼터의 남은 시간과 개인 기록은 유지됩니다.' },
       { title: '경기 결과 및 복사', description: '최종 스코어와 개인 기록을 확인한 뒤 전체 경기 기록 복사로 보관하세요.', visual: 'internalResult' },
     ],
   },
@@ -19,7 +19,7 @@ const GUIDES = {
       { title: '참석 선수 등록', description: '정규 멤버와 용병의 출석 상태를 선택하세요.', visual: 'attendance', tip: '정규 멤버는 점수가 자동 계산되고 용병은 공식 출석점수에서 제외됩니다.' },
       { title: '출전 선수 및 골키퍼', description: '현재 쿼터 출전 선수를 체크하고 체크된 선수 중 골키퍼를 선택하세요.', visual: 'externalLineup', tip: '출전 기록은 출전 쿼터 수와 득실마진 계산에 사용됩니다.' },
       { title: '득점·실점 기록', description: 'MAD FC 득점은 득점자와 어시스트를 선택하고, 상대 득점은 버튼 한 번으로 기록하세요.', visual: 'externalGoals', tip: '득점 순서는 자동 저장됩니다. 기록은 수정·삭제하거나 실행 취소할 수 있습니다.' },
-      { title: '쿼터 전환', description: '쿼터가 끝나면 다음 Q로 이동하고 변경된 출전 선수와 골키퍼만 수정하세요.', visual: 'externalQuarters', tip: '새 쿼터 최초 진입 시 직전 쿼터의 출전 선수와 골키퍼가 복사됩니다.' },
+      { title: '쿼터 전환 및 타이머', description: '타이머를 시작·일시정지하고, 쿼터가 끝나면 다음 Q로 이동하세요.', visual: 'externalQuarters', tip: '00:00에 자동 종료됩니다. 새 쿼터는 기본 시간으로 대기하며 이전 쿼터의 남은 시간은 복원할 수 있습니다.' },
       { title: '경기 결과 및 복사', description: '최종 스코어, 이벤트 순서와 개인 기록을 확인한 뒤 전체 상대전 기록 복사로 보관하세요.', visual: 'externalResult' },
     ],
   },
@@ -195,6 +195,12 @@ function QuarterVisual({ scoreSettings = false }) {
   return (
     <div className="guide-mini-ui guide-quarter-wrap" aria-label="쿼터 이동 예시">
       <ExampleBadge>스코어 예시</ExampleBadge>
+      <div className="guide-timer-visual">
+        <span>3Q 남은 시간</span>
+        <strong>13:00</strong>
+        <div><button type="button" disabled>시작</button><button type="button" disabled>초기화</button><button type="button" disabled>시간 설정</button></div>
+        <small>기본 시간 설정 · 일시정지 · 00:00 자동 종료</small>
+      </div>
       <div className="guide-quarter-visual">{[1, 2, 3, 4, 5, 6, 7, 8].map((quarter) => <span className={quarter === 3 ? 'active' : ''} key={quarter}>{quarter}Q<small>{quarter === 3 ? '2:1' : '0:0'}</small></span>)}<b>다음 Q</b></div>
       {scoreSettings ? <ScoreSettingsVisual /> : null}
     </div>

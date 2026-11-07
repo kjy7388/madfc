@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import QuarterTimer, { TimerDurationInput } from './QuarterTimer';
+import {
+  normalizeMatchTimer,
+  pauseQuarterTimer,
+  setDefaultTimerDuration,
+} from './quarterTimerState';
 import './external-match.css';
 
 export const EXTERNAL_STORAGE_KEY = 'madfc-external-match-v1';
@@ -48,6 +54,7 @@ export function createInitialExternalMatch() {
     quarters: Array.from({ length: DEFAULT_QUARTERS }, (_, index) => emptyQuarter(index)),
     events: [],
     nextSequence: 1,
+    timer: normalizeMatchTimer(null, DEFAULT_QUARTERS),
   };
 }
 
@@ -61,6 +68,7 @@ function loadSavedExternalMatch() {
         attendance: saved.attendance || {},
         temporaryPlayers: saved.temporaryPlayers || [],
         quarters: saved.quarters.map((quarter, index) => ({ ...emptyQuarter(index), ...quarter, lineup: quarter.lineup || {} })),
+        timer: normalizeMatchTimer(saved.timer, saved.quarterCount || saved.quarters.length),
       };
     }
   } catch (error) {
@@ -251,6 +259,13 @@ export default function ExternalMatch({ players, modeSwitcher = null }) {
     window.localStorage.setItem(EXTERNAL_STORAGE_KEY, JSON.stringify(match));
   }, [match]);
 
+  const updateTimer = useCallback((updater) => {
+    setMatch((current) => ({
+      ...current,
+      timer: updater(normalizeMatchTimer(current.timer, current.quarterCount)),
+    }));
+  }, []);
+
   function updateInfo(field, value) {
     setMatch((current) => ({ ...current, [field]: value }));
   }
@@ -259,7 +274,13 @@ export default function ExternalMatch({ players, modeSwitcher = null }) {
     const quarterCount = Math.min(12, Math.max(1, Number(value) || DEFAULT_QUARTERS));
     setMatch((current) => {
       const quarters = Array.from({ length: quarterCount }, (_, index) => current.quarters[index] || emptyQuarter(index));
-      return { ...current, quarterCount, quarters, currentQuarter: Math.min(current.currentQuarter, quarterCount - 1) };
+      return {
+        ...current,
+        quarterCount,
+        quarters,
+        currentQuarter: Math.min(current.currentQuarter, quarterCount - 1),
+        timer: normalizeMatchTimer(current.timer, quarterCount),
+      };
     });
   }
 
@@ -293,7 +314,13 @@ export default function ExternalMatch({ players, modeSwitcher = null }) {
       const currentAttendees = allPlayers.filter((player) => isAttending(current.attendance[player.id])).map((player) => player.id);
       const quarters = [...current.quarters];
       quarters[0] = initializeQuarter(quarters[0], currentAttendees);
-      return { ...current, phase: 'running', currentQuarter: 0, quarters };
+      return {
+        ...current,
+        phase: 'running',
+        currentQuarter: 0,
+        quarters,
+        timer: normalizeMatchTimer(current.timer, current.quarterCount),
+      };
     });
   }
 
@@ -302,7 +329,10 @@ export default function ExternalMatch({ players, modeSwitcher = null }) {
       const currentAttendees = allPlayers.filter((player) => isAttending(current.attendance[player.id])).map((player) => player.id);
       const quarters = [...current.quarters];
       quarters[index] = initializeQuarter(quarters[index], currentAttendees, index > 0 ? quarters[index - 1] : null);
-      return { ...current, currentQuarter: index, quarters };
+      let timer = normalizeMatchTimer(current.timer, current.quarterCount);
+      timer = pauseQuarterTimer(timer, current.currentQuarter);
+      timer = pauseQuarterTimer(timer, index);
+      return { ...current, currentQuarter: index, quarters, timer };
     });
   }
 
@@ -419,19 +449,36 @@ export default function ExternalMatch({ players, modeSwitcher = null }) {
     <div className="internal-page external-page">
       <header className="internal-scoreboard external-scoreboard">
         <div className="internal-topline"><a href="/" className="internal-back">← 공식 기록</a>{modeSwitcher}<span>EXTERNAL MATCH</span></div>
-        <h1>{match.opponent ? `MAD FC vs ${match.opponent}` : 'MAD FC 상대전'}</h1>
-        <time dateTime={match.date}>{match.date.replaceAll('-', '.')}</time>
-        <div className="internal-main-score" aria-label={`MAD FC ${totals.mad} 대 ${totals.opponent} ${match.opponent || '상대팀'}`}>
-          <span>MAD FC</span><strong>{totals.mad}</strong><em>:</em><strong>{totals.opponent}</strong><span>{match.opponent || 'OPPONENT'}</span>
+        <div className="scoreboard-header-content">
+          <div className="scoreboard-match-info">
+            <h1>{match.opponent ? `MAD FC vs ${match.opponent}` : 'MAD FC 상대전'}</h1>
+            <time dateTime={match.date}>{match.date.replaceAll('-', '.')}</time>
+            <div className="internal-main-score" aria-label={`MAD FC ${totals.mad} 대 ${totals.opponent} ${match.opponent || '상대팀'}`}>
+              <span>MAD FC</span><strong>{totals.mad}</strong><em>:</em><strong>{totals.opponent}</strong><span>{match.opponent || 'OPPONENT'}</span>
+            </div>
+            <p>현재 {match.currentQuarter + 1}Q · {activeScore.mad} : {activeScore.opponent}</p>
+          </div>
+          <QuarterTimer timer={match.timer} quarterIndex={match.currentQuarter} onChange={updateTimer} />
         </div>
-        <p>현재 {match.currentQuarter + 1}Q · {activeScore.mad} : {activeScore.opponent}</p>
       </header>
 
       {match.phase === 'setup' ? (
         <main className="internal-shell">
           <section className="internal-card external-setup-card">
             <div className="internal-section-head"><span>01</span><div><b>MATCH SETUP</b><h2>상대전 경기 설정</h2></div></div>
-            <ExternalInfoFields match={match} onChange={updateInfo} onQuarterCountChange={changeQuarterCount} />
+            <ExternalInfoFields match={match} onChange={updateInfo} onQuarterCountChange={changeQuarterCount}>
+              <TimerDurationInput
+                className="external-default-timer"
+                inline
+                durationSeconds={match.timer.defaultDurationSeconds}
+                onChange={(seconds) =>
+                  setMatch((current) => ({
+                    ...current,
+                    timer: setDefaultTimerDuration(current.timer, seconds, current.quarterCount),
+                  }))
+                }
+              />
+            </ExternalInfoFields>
             <AttendanceEditor players={allPlayers} attendance={match.attendance} onChange={updateAttendance} temporaryName={temporaryName} onTemporaryNameChange={setTemporaryName} onAddTemporary={addTemporaryPlayer} />
             <button className="internal-primary external-start" type="button" onClick={startMatch}>경기 시작</button>
           </section>
@@ -513,13 +560,14 @@ export default function ExternalMatch({ players, modeSwitcher = null }) {
   );
 }
 
-function ExternalInfoFields({ match, onChange, onQuarterCountChange, compact = false }) {
+function ExternalInfoFields({ match, onChange, onQuarterCountChange, compact = false, children = null }) {
   return (
-    <div className={`external-info-grid ${compact ? 'compact' : ''}`}>
+    <div className={`external-info-grid ${compact ? 'compact' : ''} ${children ? 'with-timer' : ''}`.trim()}>
       <label>경기 날짜<input type="date" value={match.date} onChange={(event) => onChange('date', event.target.value)} /></label>
       <label>경기 장소<input value={match.venue} onChange={(event) => onChange('venue', event.target.value)} placeholder="예: 용산" /></label>
       <label>상대팀 이름<input value={match.opponent} onChange={(event) => onChange('opponent', event.target.value)} placeholder="상대팀" /></label>
       <label>전체 쿼터 수<input type="number" min="1" max="12" value={match.quarterCount} disabled={match.phase !== 'setup'} onChange={(event) => onQuarterCountChange(event.target.value)} /></label>
+      {children}
     </div>
   );
 }

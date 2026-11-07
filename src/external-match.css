@@ -14,7 +14,17 @@
   gap: 9px;
 }
 
-.external-info-grid label,
+.external-info-grid.with-timer {
+  grid-template-columns:
+    minmax(150px, 1.1fr)
+    minmax(125px, 0.9fr)
+    minmax(135px, 1fr)
+    minmax(92px, 0.65fr)
+    minmax(210px, 1.35fr);
+  align-items: end;
+}
+
+.external-info-grid > label,
 .external-event-modal > label {
   display: grid;
   min-width: 0;
@@ -24,7 +34,7 @@
   font-weight: 850;
 }
 
-.external-info-grid input,
+.external-info-grid > label > input,
 .external-event-modal select,
 .goalkeeper-select select {
   display: block;
@@ -41,13 +51,13 @@
   font: inherit;
 }
 
-.external-info-grid input[type="date"] {
+.external-info-grid > label > input[type="date"] {
   -webkit-appearance: none;
   appearance: none;
   line-height: 44px;
 }
 
-.external-info-grid input[type="date"]::-webkit-date-and-time-value {
+.external-info-grid > label > input[type="date"]::-webkit-date-and-time-value {
   display: flex;
   align-items: center;
   min-width: 0;
@@ -481,10 +491,12 @@
 
 @media (max-width: 900px) {
   .external-info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .external-info-grid.with-timer { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 767px) {
   .attendance-groups { grid-template-columns: 1fr; }
+  .external-info-grid.with-timer > .external-default-timer { grid-column: 1 / -1; }
 }
 
 @media (max-width: 767px) {
@@ -504,6 +516,7 @@
 
 @media (max-width: 430px) {
   .external-info-grid { grid-template-columns: 1fr; }
+  .external-info-grid.with-timer { grid-template-columns: 1fr; }
   .external-attendance-row { grid-template-columns: minmax(72px, 1fr) 104px 55px; gap: 4px; padding-inline: 6px; }
   .external-lineup-row { grid-template-columns: 40px minmax(65px, 1fr) auto; padding-inline: 6px; }
   .external-event-row { grid-template-columns: 25px minmax(0, 1fr) 38px 38px; padding-inline: 6px; }

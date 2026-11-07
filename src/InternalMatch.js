@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import QuarterTimer, { TimerDurationInput } from './QuarterTimer';
+import {
+  normalizeMatchTimer,
+  pauseQuarterTimer,
+  setDefaultTimerDuration,
+} from './quarterTimerState';
 import './internal-match.css';
 
 const STORAGE_KEY = 'madfc-internal-match-v1';
@@ -38,6 +44,7 @@ export function createInitialInternalMatch() {
     matchAttendance: {},
     temporaryPlayers: [],
     quarters: Array.from({ length: QUARTER_COUNT }, (_, index) => emptyQuarter(index)),
+    timer: normalizeMatchTimer(null, QUARTER_COUNT),
   };
 }
 
@@ -48,6 +55,7 @@ function loadSavedMatch() {
       return {
         ...saved,
         matchAttendance: saved.matchAttendance || {},
+        timer: normalizeMatchTimer(saved.timer, QUARTER_COUNT),
         quarters: saved.quarters.map((quarter) => ({
           ...quarter,
           scoreIncluded: quarter.scoreIncluded !== false,
@@ -283,6 +291,13 @@ export default function InternalMatch({ players, modeSwitcher = null }) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(match));
   }, [match]);
 
+  const updateTimer = useCallback((updater) => {
+    setMatch((current) => ({
+      ...current,
+      timer: updater(normalizeMatchTimer(current.timer, QUARTER_COUNT)),
+    }));
+  }, []);
+
   function updateAssignment(playerId, team) {
     setMatch((current) => ({
       ...current,
@@ -326,7 +341,13 @@ export default function InternalMatch({ players, modeSwitcher = null }) {
     setMatch((current) => {
       const quarters = [...current.quarters];
       quarters[0] = initializeQuarter(quarters[0], current.assignments, current.matchAttendance);
-      return { ...current, phase: 'running', currentQuarter: 0, quarters };
+      return {
+        ...current,
+        phase: 'running',
+        currentQuarter: 0,
+        quarters,
+        timer: normalizeMatchTimer(current.timer, QUARTER_COUNT),
+      };
     });
   }
 
@@ -334,7 +355,10 @@ export default function InternalMatch({ players, modeSwitcher = null }) {
     setMatch((current) => {
       const quarters = [...current.quarters];
       quarters[index] = initializeQuarter(quarters[index], current.assignments, current.matchAttendance, index > 0 ? quarters[index - 1] : null);
-      return { ...current, currentQuarter: index, quarters };
+      let timer = normalizeMatchTimer(current.timer, QUARTER_COUNT);
+      timer = pauseQuarterTimer(timer, current.currentQuarter);
+      timer = pauseQuarterTimer(timer, index);
+      return { ...current, currentQuarter: index, quarters, timer };
     });
   }
 
@@ -422,22 +446,38 @@ export default function InternalMatch({ players, modeSwitcher = null }) {
           {modeSwitcher}
           <span>INTERNAL MATCH</span>
         </div>
-        <h1>MAD FC 자체전</h1>
-        <time dateTime={match.date}>{match.date.replaceAll('-', '.')}</time>
-        <div className="internal-main-score" aria-label={`A팀 ${totals.A} 대 ${totals.B} B팀`}>
-          <span>A TEAM</span><strong>{totals.A}</strong><em>:</em><strong>{totals.B}</strong><span>B TEAM</span>
+        <div className="scoreboard-header-content">
+          <div className="scoreboard-match-info">
+            <h1>MAD FC 자체전</h1>
+            <time dateTime={match.date}>{match.date.replaceAll('-', '.')}</time>
+            <div className="internal-main-score" aria-label={`A팀 ${totals.A} 대 ${totals.B} B팀`}>
+              <span>A TEAM</span><strong>{totals.A}</strong><em>:</em><strong>{totals.B}</strong><span>B TEAM</span>
+            </div>
+            <p>
+              현재 진행: {match.currentQuarter + 1} / {QUARTER_COUNT} QUARTER
+              {hasExcludedQuarters ? <span className="score-basis"> · 승부 스코어: {getScoreBasis(match.quarters)}</span> : null}
+            </p>
+          </div>
+          <QuarterTimer timer={match.timer} quarterIndex={match.currentQuarter} onChange={updateTimer} />
         </div>
-        <p>
-          현재 진행: {match.currentQuarter + 1} / {QUARTER_COUNT} QUARTER
-          {hasExcludedQuarters ? <span className="score-basis"> · 승부 스코어: {getScoreBasis(match.quarters)}</span> : null}
-        </p>
       </header>
 
       {match.phase === 'setup' ? (
         <main className="internal-shell">
           <section className="internal-card setup-card">
             <div className="internal-section-head"><span>01</span><div><b>MATCH SETUP</b><h2>경기 및 팀 설정</h2></div></div>
-            <label className="internal-date">경기 날짜<input type="date" value={match.date} onChange={(event) => setMatch((current) => ({ ...current, date: event.target.value }))} /></label>
+            <div className="internal-setup-basics">
+              <label className="internal-date">경기 날짜<input type="date" value={match.date} onChange={(event) => setMatch((current) => ({ ...current, date: event.target.value }))} /></label>
+              <TimerDurationInput
+                durationSeconds={match.timer.defaultDurationSeconds}
+                onChange={(seconds) =>
+                  setMatch((current) => ({
+                    ...current,
+                    timer: setDefaultTimerDuration(current.timer, seconds, QUARTER_COUNT),
+                  }))
+                }
+              />
+            </div>
             <p className="internal-help">선수를 A팀 또는 B팀에 배정하세요. 배정하지 않은 선수는 이번 자체전에 포함되지 않습니다.</p>
             <AssignmentGroups players={allPlayers} assignments={match.assignments} attendance={match.matchAttendance} onAssignmentChange={updateAssignment} onAttendanceChange={updateMatchAttendance} />
             <form className="temporary-player-form" onSubmit={addTemporaryPlayer}>

@@ -1,0 +1,287 @@
+.scoreboard-header-content {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(230px, 2fr);
+  align-items: center;
+  gap: 18px;
+  margin-top: 2px;
+}
+
+.scoreboard-match-info {
+  min-width: 0;
+  text-align: center;
+}
+
+.scoreboard-match-info > p {
+  margin: 4px 0 0;
+  color: #94a3b8;
+  font-size: 0.78rem;
+}
+
+.quarter-timer {
+  position: relative;
+  min-width: 0;
+  padding: 2px 0 2px 18px;
+  border-left: 1px solid rgba(96, 165, 250, 0.24);
+  text-align: center;
+}
+
+.quarter-timer-label {
+  margin: 0;
+  color: #93c5fd;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.quarter-timer-display {
+  display: block;
+  margin: 0;
+  color: #f8fafc;
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.quarter-timer-display.is-warning { color: #fb923c; }
+.quarter-timer-display.is-danger,
+.quarter-timer-display.is-ended { color: #f87171; }
+
+.quarter-timer-ended {
+  position: absolute;
+  top: 3px;
+  right: 2px;
+  color: #fca5a5;
+  font-size: 0.62rem;
+  font-weight: 900;
+}
+
+.quarter-timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.quarter-timer button {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  background: #111b2e;
+  color: #cbd5e1;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.quarter-timer button.is-primary {
+  border-color: #2563eb;
+  background: #1d4ed8;
+  color: #fff;
+}
+
+.quarter-timer button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.quarter-timer-settings {
+  position: absolute;
+  z-index: 12;
+  top: calc(100% + 7px);
+  right: 0;
+  width: min(300px, 75vw);
+  padding: 10px;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  background: #0b1220;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.quarter-timer-settings-fields,
+.quarter-timer-settings-actions {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.quarter-timer-settings-fields label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #cbd5e1;
+  font-size: 0.76rem;
+}
+
+.quarter-timer-settings input,
+.timer-duration-input input {
+  box-sizing: border-box;
+  width: 58px;
+  min-width: 0;
+  height: 36px;
+  border: 1px solid #334155;
+  border-radius: 7px;
+  background: #08101f;
+  color: #f8fafc;
+  font: inherit;
+  text-align: center;
+}
+
+.quarter-timer-settings-actions {
+  margin-top: 8px;
+}
+
+.timer-duration-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 7px 10px 9px;
+  border: 1px solid #24324b;
+  border-radius: 9px;
+}
+
+.timer-duration-input legend {
+  padding: 0 4px;
+  color: #94a3b8;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.timer-duration-input label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #cbd5e1;
+  font-size: 0.75rem;
+}
+
+.internal-setup-basics {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+}
+
+.external-default-timer {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+.timer-duration-inline {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+}
+
+.timer-duration-title {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 850;
+  line-height: normal;
+}
+
+.timer-duration-inline-fields {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid #2b3650;
+  border-radius: 10px;
+  background: #101827;
+}
+
+.timer-duration-inline-fields label {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  color: #cbd5e1;
+  font-size: 0.75rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.timer-duration-inline-fields input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 42px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 6px;
+  background: #08101f;
+  color: #f8fafc;
+  font: inherit;
+  text-align: center;
+}
+
+@media (min-width: 769px) and (max-width: 1194px) {
+  .scoreboard-match-info > p {
+    margin-top: 1px;
+    font-size: 0.65rem;
+    line-height: 1.1;
+  }
+}
+
+@media (max-width: 767px) {
+  .scoreboard-header-content {
+    grid-template-columns: minmax(0, 1.15fr) minmax(135px, 0.85fr);
+    gap: 8px;
+  }
+
+  .quarter-timer {
+    padding-left: 8px;
+  }
+
+  .quarter-timer-display {
+    font-size: clamp(1.65rem, 9vw, 2.35rem);
+  }
+
+  .quarter-timer-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .quarter-timer-controls button {
+    min-width: 0;
+    min-height: 32px;
+    padding: 0 5px;
+    font-size: 0.65rem;
+  }
+
+  .quarter-timer-controls button:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .quarter-timer-settings {
+    position: fixed;
+    top: 50%;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    transform: translateY(-50%);
+  }
+
+  .internal-setup-basics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .timer-duration-input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+}

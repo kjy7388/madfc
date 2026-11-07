@@ -27,6 +27,8 @@ export const seasonData = {
     { id: 'p14', name: '류경상', position: 'FW', guest: true },
     { id: 'p15', name: '정세영', position: 'FW', guest: true },
     { id: 'p16', name: '정연규', position: 'MF', guest: true },
+    { id: 'p17', name: '곽찬웅', position: 'FW', guest: true },
+    { id: 'p18', name: '이명건', position: 'MF', guest: true },
   ],
   matches: [
     {
@@ -110,6 +112,34 @@ export const seasonData = {
         p13: { attendanceScore: 0, goals: 1, assists: 1, appearances: [true, true, false, true, true, true, true] },
         p15: { attendanceScore: 0, goals: 3, assists: 2, appearances: [true, false, true, true, false, true, true] },
         p16: { attendanceScore: 0, goals: 1, assists: 1, appearances: [false, true, true, false, true, true, false] },
+      },
+    },
+    {
+      id: '20261107',
+      matchType: 'external',
+      date: '2026-11-07',
+      venue: '마포',
+      opponent: '삼일FC',
+      teamScore: 20,
+      opponentScore: 12,
+      quarters: [
+        { label: '1쿼터', cumulativeScore: '7:0', players: ['고유순', '김장엽', '전창욱', '조도연', '이명건'], goalkeeper: '고유순', for: 7, against: 0, events: [{ type: 'goal', scorer: '이명건' }, { type: 'goal', scorer: '김장엽', assist: '고유순' }, { type: 'goal', scorer: '고유순', assist: '조도연' }, { type: 'goal', scorer: '조도연', assist: '이명건' }, { type: 'goal', scorer: '조도연', assist: '전창욱' }, { type: 'goal', scorer: '조도연' }, { type: 'goal', scorer: '조도연', assist: '김장엽' }] },
+        { label: '2쿼터', cumulativeScore: '7:0', players: ['고유순', '전대영', '조도연', '이명건', '곽찬웅'], goalkeeper: '조도연', for: 0, against: 0, events: [] },
+        { label: '3쿼터', cumulativeScore: '13:1', players: ['김장엽', '전창욱', '전대영', '이명건', '곽찬웅'], goalkeeper: '김장엽', for: 6, against: 1, events: [{ type: 'goal', scorer: '전창욱', assist: '이명건' }, { type: 'goal', scorer: '곽찬웅', assist: '전대영' }, { type: 'goal', scorer: '이명건', assist: '전창욱' }, { type: 'goal', scorer: '곽찬웅' }, { type: 'goal', scorer: '곽찬웅', assist: '전창욱' }, { type: 'goal', scorer: '곽찬웅', assist: '전대영' }, { type: 'against' }] },
+        { label: '4쿼터', cumulativeScore: '13:6', players: ['고유순', '김장엽', '전창욱', '조도연', '이명건'], goalkeeper: '전창욱', for: 0, against: 5, events: [{ type: 'against' }, { type: 'against' }, { type: 'against' }, { type: 'against' }, { type: 'against' }] },
+        { label: '5쿼터', cumulativeScore: '13:6', players: ['고유순', '전창욱', '전대영', '조도연', '곽찬웅'], goalkeeper: '곽찬웅', for: 0, against: 0, events: [] },
+        { label: '6쿼터', cumulativeScore: '15:8', players: ['김장엽', '전창욱', '전대영', '이명건', '곽찬웅'], goalkeeper: '전대영', for: 2, against: 2, events: [{ type: 'goal', scorer: '곽찬웅', assist: '전창욱' }, { type: 'goal', scorer: '김장엽' }, { type: 'against' }, { type: 'against' }] },
+        { label: '7쿼터', cumulativeScore: '17:10', players: ['고유순', '김장엽', '전대영', '조도연', '곽찬웅'], goalkeeper: '김장엽', for: 2, against: 2, events: [{ type: 'against' }, { type: 'goal', scorer: '곽찬웅', assist: '고유순' }, { type: 'goal', scorer: '조도연', assist: '곽찬웅' }, { type: 'against' }] },
+        { label: '8쿼터', cumulativeScore: '20:12', players: ['고유순', '김장엽', '전창욱', '전대영', '조도연', '곽찬웅'], goalkeeper: '전대영', for: 3, against: 2, events: [{ type: 'against' }, { type: 'goal', scorer: '김장엽', assist: '고유순' }, { type: 'goal', scorer: '곽찬웅', assist: '조도연' }, { type: 'goal', scorer: '조도연', assist: '곽찬웅' }, { type: 'against' }] },
+      ],
+      playerStats: {
+        p3: { attendanceScore: 3, goals: 1, assists: 3, appearances: [true, true, false, true, true, false, true, true], goalkeeperAppearances: [true, false, false, false, false, false, false, false] },
+        p17: { attendanceScore: 0, goals: 7, assists: 2, appearances: [false, true, true, false, true, true, true, true], goalkeeperAppearances: [false, false, false, false, true, false, false, false] },
+        p4: { attendanceScore: 3, goals: 3, assists: 1, appearances: [true, false, true, true, false, true, true, true], goalkeeperAppearances: [false, false, true, false, false, false, true, false] },
+        p18: { attendanceScore: 0, goals: 2, assists: 2, appearances: [true, true, true, true, false, true, false, false], goalkeeperAppearances: [false, false, false, false, false, false, false, false] },
+        p8: { attendanceScore: 0, goals: 0, assists: 2, appearances: [false, true, true, false, true, true, true, true], goalkeeperAppearances: [false, false, false, false, false, true, false, true] },
+        p6: { attendanceScore: 3, goals: 1, assists: 4, appearances: [true, false, true, true, true, true, false, true], goalkeeperAppearances: [false, false, false, true, false, false, false, false] },
+        p10: { attendanceScore: 3, goals: 6, assists: 2, appearances: [true, true, false, true, true, false, true, true], goalkeeperAppearances: [false, true, false, false, false, false, false, false] },
       },
     },
     ...internalMatches,
@@ -488,7 +518,7 @@ function App() {
                       <td>{stat.goals ?? 0}</td>
                       <td>{stat.assists ?? 0}</td>
                       <td className="highlight">{points}</td>
-                      <td><AppearanceDots appearances={stat.appearances} total={selectedMatch.quarters.length} /></td>
+                      <td><AppearanceDots appearances={stat.appearances} goalkeeperAppearances={stat.goalkeeperAppearances} total={selectedMatch.quarters.length} /></td>
                       <td className={plusMinus >= 0 ? 'positive' : 'negative'}>{formatSigned(plusMinus)}</td>
                     </tr>
                   );
@@ -586,7 +616,10 @@ function QuarterCard({ quarter, players, internal = false }) {
       </div>
       <strong>{quarter.for} : {quarter.against}</strong>
       <p className={margin >= 0 ? 'positive' : 'negative'}>{formatSigned(margin)}</p>
-      <div className="lineup">{quarter.players.join(' · ')}</div>
+      <div className="lineup">
+        {quarter.players.join(' · ')}
+        {quarter.goalkeeper ? <span className="quarter-goalkeeper">GK · {quarter.goalkeeper}</span> : null}
+      </div>
       <div className="event-list">
         {quarter.events.map((event, index) => (
           <EventRow event={event} key={`${quarter.label}-${index}`} />
@@ -620,13 +653,14 @@ function EventRow({ event }) {
   );
 }
 
-function AppearanceDots({ appearances = [], total = 8 }) {
+function AppearanceDots({ appearances = [], goalkeeperAppearances = [], total = 8 }) {
   const dots = Array.from({ length: total }, (_, index) => Boolean(appearances[index]));
   const playedCount = dots.filter(Boolean).length;
+  const goalkeeperCount = goalkeeperAppearances.filter(Boolean).length;
 
   return (
-    <div className="appearance-cell" aria-label={`총 ${playedCount}쿼터 출전`}>
-      <b>{playedCount}쿼터</b>
+    <div className="appearance-cell" aria-label={`총 ${playedCount}쿼터 출전${goalkeeperCount ? `, 골키퍼 ${goalkeeperCount}쿼터` : ''}`}>
+      <b>{playedCount}쿼터{goalkeeperCount ? ` · GK ${goalkeeperCount}Q` : ''}</b>
       <div className="appearance-dots" style={{ '--quarter-count': total }}>
         {dots.map((played, index) => (
           <span

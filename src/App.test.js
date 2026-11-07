@@ -45,3 +45,17 @@ test('opens and closes the cumulative stats policy dialog', () => {
   fireEvent.keyDown(window, { key: 'Escape' });
   expect(screen.queryByRole('dialog', { name: 'MAD FC 누적 스탯 반영 기준' })).not.toBeInTheDocument();
 });
+
+test('renders the 2026-11-07 Samil FC detail and analysis', () => {
+  render(<App />);
+
+  fireEvent.change(screen.getByLabelText('경기일정'), { target: { value: '20261107' } });
+  expect(screen.getByText('Mad FC vs 삼일FC')).toBeInTheDocument();
+  expect(screen.getByText(/최종 스코어 20 : 12/)).toBeInTheDocument();
+  expect(screen.getAllByText(/GK ·/)).toHaveLength(8);
+
+  fireEvent.click(screen.getByRole('button', { name: '경기 분석' }));
+  expect(screen.getByText('11월 7일 삼일FC전 총평')).toBeInTheDocument();
+  expect(screen.getByText('삼일FC와의 다음 경기 운영 방향')).toBeInTheDocument();
+  expect(screen.getAllByText(/득실마진/).length).toBeGreaterThanOrEqual(7);
+});
